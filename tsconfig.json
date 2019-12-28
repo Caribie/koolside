@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ES2018",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "target": "ES2018",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "jsx": "react-native",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

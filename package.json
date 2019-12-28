@@ -1,0 +1,38 @@
+{
+  "name": "koolside",
+  "version": "1.0.0",
+  "description": "디시인사이드 도우미",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run-script clean && webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toriato/koolside.git"
+  },
+  "author": "Sangha Lee <totoriato@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/toriato/koolside/issues"
+  },
+  "homepage": "https://github.com/toriato/koolside#readme",
+  "devDependencies": {
+    "@types/common-tags": "^1.8.0",
+    "@types/query-string": "^6.3.0",
+    "@typescript-eslint/eslint-plugin": "^2.13.0",
+    "@typescript-eslint/parser": "^2.13.0",
+    "eslint": "^6.8.0",
+    "rimraf": "^3.0.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "common-tags": "^1.8.0",
+    "dot-prop": "^5.2.0",
+    "p-limit": "^2.2.1",
+    "query-string": "^6.9.0",
+    "wait-for-the-element": "^2.2.0"
+  }
+}
