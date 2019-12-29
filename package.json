@@ -6,7 +6,7 @@
     "lint": "eslint --fix src/**/*",
     "watch": "webpack --watch --progress",
     "clean": "rimraf dist",
-    "build": "npm run lint && webpack -p"
+    "build": "npm run lint && webpack --mode production"
   },
   "repository": {
     "type": "git",
