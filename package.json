@@ -1,8 +1,10 @@
 {
   "name": "koolside",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "디시인사이드 도우미",
   "scripts": {
+    "lint": "eslint --fix src/**/*",
+    "watch": "webpack --watch --progress",
     "clean": "rimraf dist",
     "build": "npm run-script clean && webpack"
   },
@@ -17,10 +19,12 @@
   },
   "homepage": "https://github.com/toriato/koolside#readme",
   "devDependencies": {
-    "@types/common-tags": "^1.8.0",
+    "@types/node": "^13.1.1",
     "@types/query-string": "^6.3.0",
+    "@types/string-format": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.13.0",
     "@typescript-eslint/parser": "^2.13.0",
+    "common-tags": "^1.8.0",
     "eslint": "^6.8.0",
     "rimraf": "^3.0.0",
     "ts-loader": "^6.2.1",
@@ -29,10 +33,12 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "common-tags": "^1.8.0",
     "dot-prop": "^5.2.0",
+    "eslint-plugin-simple-import-sort": "^5.0.0",
     "p-limit": "^2.2.1",
     "query-string": "^6.9.0",
+    "sass.js": "^0.11.1",
+    "string-format": "^2.0.0",
     "wait-for-the-element": "^2.2.0"
   }
 }

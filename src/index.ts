@@ -1,10 +1,12 @@
 import pLimit from 'p-limit'
 import { tryAndWaitForTheElement } from 'wait-for-the-element'
-import { fetchList } from './includes/request'
-import { createElement, getParameter } from './includes/utils'
+
+import componentPreview from './components/preview'
+import componentStyle from './components/style'
 import cache from './includes/cache'
-import { STYLESHEET } from './includes/static'
 import config from './includes/config'
+import { fetchList } from './includes/request'
+import { getParameter } from './includes/utils'
 
 const gallery = getParameter('id')
 
@@ -13,8 +15,10 @@ async function main () {
   config.sync()
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
-  const stylesheet = createElement(STYLESHEET)
-  const preview = createElement('<div class="ks-preview"></div>')
+  componentStyle.onCreate()
+  componentPreview.onCreate()
+
+  const preview = document.querySelector('#ks-preview') as HTMLElement
 
   function onMouseEvent (e: MouseEvent) {
     let el = e.target as HTMLElement
@@ -37,8 +41,10 @@ async function main () {
     }
   
     if (el) {
+      const no = parseInt(el.dataset.no, 10)
+
       // 현재 프리뷰가 선택한 게시글이 아니라면 업데이트하기
-      if (preview.dataset.no !== el.dataset.no) {
+      if (cache.has(no) && preview.dataset.no !== el.dataset.no) {
         const scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
         const clientTop = document.body.clientTop || document.documentElement.clientTop || 0
 
@@ -48,24 +54,23 @@ async function main () {
         preview.style.top = `${top}px`
         preview.style.left = `${e.pageX + 25}px`
         preview.dataset.no = el.dataset.no
-        preview.innerHTML = cache.get(parseInt(el.dataset.no, 10)).innerHTML
-        preview.classList.add('active')
+        preview.innerHTML = cache.get(no).innerHTML
+        preview.classList.add('ks-active')
 
         for (let img of preview.querySelectorAll('img')) {
           img.addEventListener('click', function () {
-            this.classList.toggle('active')
+            this.classList.toggle('ks-active')
           })
         }
       }
     } else {
       // 프리뷰 박스 초기화
-      preview.classList.remove('active')
+      preview.classList.remove('ks-active')
       preview.innerHTML = ''
       delete preview.dataset.no
     }
   }
 
-  document.head.append(stylesheet)
   document.body.prepend(preview)
 
   document.addEventListener('mousemove', onMouseEvent)

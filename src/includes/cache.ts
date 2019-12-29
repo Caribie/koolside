@@ -1,6 +1,5 @@
-import { createElement } from './utils'
-import { REGEX_BODY } from './static'
 import request from './request'
+import { BODY_PATTERN,createElement } from './utils'
 
 class Cache extends Map<number, Element> {
   async fetchPost (gallery: string, no: number) {
@@ -13,7 +12,7 @@ class Cache extends Map<number, Element> {
     })
   
     // body 태그 속만 불러오기
-    const matches = res.responseText.match(REGEX_BODY)
+    const matches = res.responseText.match(BODY_PATTERN)
     const $ = createElement(matches.groups.body).parentNode
   
     // 필요없는 태그 제거하기

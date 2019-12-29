@@ -10,9 +10,9 @@ export default class Storage {
   private readonly opts: StorageOptions
   private storage: LooseObject
 
-  constructor (key: string, opts: StorageOptions) {
+  constructor (key: string, opts?: StorageOptions) {
     this.key = key
-    this.opts = opts
+    this.opts = opts || {}
     this.storage = GM_getValue<LooseObject>(key, opts.defaultValue)
   }
 
@@ -25,7 +25,7 @@ export default class Storage {
   }
 
   get<T = Storable> (key: string) {
-    return dotProp.get<T>(this.storage, key)
+    return dotProp.get<T>(this.storage, key) || dotProp.get<T>(this.opts.defaultValue, key)
   }
 
   set (key: string, value: Storable) {

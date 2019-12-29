@@ -11,7 +11,4 @@ export function getParameter (key: string) {
   return params[key] as string
 }
 
-// eslint-disable-next-line
-// export interface LooseObject<T = any> {
-//   [k: string]: T;
-// }
+export const BODY_PATTERN = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im

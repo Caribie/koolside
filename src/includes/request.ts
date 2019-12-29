@@ -1,6 +1,5 @@
 import cache from './cache'
-import { createElement } from './utils'
-import { REGEX_BODY } from './static'
+import { BODY_PATTERN,createElement } from './utils'
 
 export default function request (opts: GM_RequestInfo) {
   return new Promise<GM_Response>((resolve, reject) => {
@@ -40,7 +39,7 @@ export async function fetchList (gallery: string) {
   })
 
   // body 태그 속만 불러오기
-  const matches = res.responseText.match(REGEX_BODY)
+  const matches = res.responseText.match(BODY_PATTERN)
   const $ = createElement(matches.groups.body).parentNode
 
   // 필요없는 글은 삭제하기
