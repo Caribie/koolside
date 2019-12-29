@@ -35,11 +35,14 @@ const template =  /* less */`
     &.ks-hide-logo .dc_logo {
       visibility: hidden;
     }
-    &.ks-hide-title .left_content header {
-      display: none
+    &.ks-hide-title {
+      .wrap_inner header,
+      .left_content header {
+        display: none;
+      }
     }
     &.ks-hide-titlebar .left_content article:nth-child(2) {
-      display: none 
+      display: none;
     }
 
     &.ks-hide-right {
