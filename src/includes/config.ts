@@ -125,6 +125,10 @@ const defaultValue = generateDefaultValues(details)
 const config = new Storage('config', {
   defaultValue,
   onSync () {
+    if (!location.href.startsWith('https://gall.dcinside.com/')) {
+      return
+    }
+
     const classes = []
 
     if (this.get('hide.ad')) classes.push('ks-hide-ad')

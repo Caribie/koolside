@@ -5,6 +5,15 @@ import { createElement } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
 
+const checkboxTemplate = createElement(/* html */`
+  <td class="gall_chk">
+    <span class="checkbox">
+      <input type="checkbox" name="chk_article[]" class="list_chkbox article_chkbox">
+      <em class="checkmark"></em>
+    </span>
+  </td>
+`)
+
 export default function request (opts: string | GM_RequestInfo) {
   const options = typeof opts === 'string' ? { url: opts } : opts
 
@@ -123,10 +132,12 @@ export async function fetchList (gallery: string, html?: string) {
 
   // 필요없는 글은 삭제하기
   const $ = createElement(matches.groups.body).parentNode
+
   const newPosts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const addedPosts = []
 
   const table = document.querySelector('.gall_list tbody')
+  const hasCheckbox = document.querySelector('.chkbox_th') !== null
 
   for (let newPost of newPosts) {
     switch (true) {
@@ -136,14 +147,26 @@ export async function fetchList (gallery: string, html?: string) {
 
     const post = parseInt(newPost.dataset.no, 10)
 
+    // 관리용 체크박스가 필요하다면 붙이기
+    if (hasCheckbox) {
+      newPost.prepend(checkboxTemplate)
+    }
+
     // 기존 글 댓글 수, 조회 수 등 업데이트
     const cachedPost = document.querySelector(`.us-post[data-no="${newPost.dataset.no}"]`) 
     if (cachedPost) {
+
+      if (hasCheckbox) {
+        const checked = cachedPost.querySelector<HTMLInputElement>('.gall_chk input').checked
+        newPost.querySelector<HTMLInputElement>('.gall_chk input').checked = checked
+      }
+
       cachedPost.innerHTML = newPost.innerHTML
     }
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
     if (!cache.has(gallery, post)) {
+
       // 직접 HTML 코드를 전달받지 않았다면 목록에 추가하기
       if (override) {
         newPost.classList.add('ks-new')
