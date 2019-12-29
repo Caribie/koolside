@@ -15,6 +15,10 @@ export const details = {
   hide: {
     name: '숨길 요소',
     items: {
+      ad: {
+        name: '광고',
+        default: true
+      },
       logo: {
         name: '웹 사이트 로고',
         default: false
@@ -109,6 +113,7 @@ const config = new Storage('config', {
   onSync () {
     const classes = []
 
+    if (this.get('hide.ad')) classes.push('ks-hide-ad')
     if (this.get('hide.logo')) classes.push('ks-hide-logo')
     if (this.get('hide.title')) classes.push('ks-hide-title')
     if (this.get('hide.titlebar')) classes.push('ks-hide-titlebar')

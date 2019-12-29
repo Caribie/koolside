@@ -1,12 +1,12 @@
 {
   "name": "koolside",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "디시인사이드 도우미",
   "scripts": {
     "lint": "eslint --fix src/**/*",
     "watch": "webpack --watch --progress",
     "clean": "rimraf dist",
-    "build": "npm run-script clean && webpack"
+    "build": "npm run lint && webpack -p"
   },
   "repository": {
     "type": "git",

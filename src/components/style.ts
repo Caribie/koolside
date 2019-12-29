@@ -32,15 +32,32 @@ const template =  /* less */`
   }
 
   body {
+    /* 시발 광고 */
+    &.ks-hide-ad {
+      .wrap_inner {
+        #ad-layer,
+        #zzbang_ad,
+        .rightbanner,
+        .ub-content.dory {
+          display: none;
+        }
+      }
+    }
+
+    /* 로고 */
     &.ks-hide-logo .dc_logo {
       visibility: hidden;
     }
+
+    /* 타이틀 */
     &.ks-hide-title {
       .wrap_inner header,
       .left_content header {
         display: none;
       }
     }
+
+    /* 타이틀 바 */
     &.ks-hide-titlebar .left_content article:nth-child(2) {
       display: none;
     }
