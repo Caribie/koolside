@@ -12,9 +12,6 @@ import { getParameter } from './includes/utils'
 async function main () {
   const gallery = getParameter('id')
 
-  // 설정 맞추기
-  config.sync()
-
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentStyle.create()
   componentConfig.create()
@@ -79,6 +76,9 @@ async function main () {
   })
 
   await fetchList(gallery, document.body.outerHTML)
+
+  // 설정 맞추기
+  config.sync()
 }
 
 // 최상단 페이지에서만 스크립트 실행하기
