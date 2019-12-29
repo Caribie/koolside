@@ -16,4 +16,4 @@
 <a href="https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag"><img src="docs/chrome_webstore.png" alt="Chrome Web Store" width="200"></a>
 
 ### 유저스크립트 추가하기
-[설치하기](dist/lib.user.js) 주소를 클릭하면 시작됩니다.
+[설치하기](https://github.com/toriato/koolside/raw/master/dist/lib.user.js) 주소를 클릭하면 가장 최신 판으로 설치됩니다.
