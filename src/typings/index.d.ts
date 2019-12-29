@@ -4,6 +4,6 @@ interface LooseObject<T = any> {
 }
 
 interface Component {
-  onCreate(): void;
-  onDestroy(): void;
+  create(): void;
+  destroy(): void;
 }

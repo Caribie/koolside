@@ -1,6 +1,8 @@
 import pLimit from 'p-limit'
 import { tryAndWaitForTheElement } from 'wait-for-the-element'
 
+import componentConfig from './components/config'
+import componentNav from './components/nav'
 import componentPreview from './components/preview'
 import componentStyle from './components/style'
 import cache from './includes/cache'
@@ -15,8 +17,10 @@ async function main () {
   config.sync()
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
-  componentStyle.onCreate()
-  componentPreview.onCreate()
+  componentStyle.create()
+  componentConfig.create()
+  componentNav.create()
+  componentPreview.create()
 
   const preview = document.querySelector('#ks-preview') as HTMLElement
 

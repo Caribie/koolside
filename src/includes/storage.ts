@@ -6,8 +6,8 @@ interface StorageOptions {
 }
 
 export default class Storage {
-  private readonly key: string
-  private readonly opts: StorageOptions
+  public readonly key: string
+  public readonly opts: StorageOptions
   private storage: LooseObject
 
   constructor (key: string, opts?: StorageOptions) {

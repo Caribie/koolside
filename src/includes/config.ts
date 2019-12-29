@@ -11,7 +11,7 @@ function generateDefaultValeus (details: LooseObject, map?: (key: string, value:
   return result
 }
 
-const details = {
+export const details = {
   hide: {
     name: '숨길 요소',
     items: {
@@ -85,10 +85,6 @@ const details = {
         name: '고정폭 글꼴',
         default: '"D2Coding", NanumGothicCoding, monospace'
       },
-      font_size_list: {
-        name: '게시글 목록 글자 크기',
-        default: '1em'
-      },
       font_size_preview: {
         name: '프리뷰 글자 크기',
         default: '1.5em'
@@ -125,7 +121,7 @@ const config = new Storage('config', {
       if (this.get('hide.right.issuezoom')) classes.push('ks-hide-right-issuezoom')
       if (this.get('hide.right.news')) classes.push('ks-hide-right-news')
       if (this.get('hide.right.realtime')) classes.push('ks-hide-right-realtime')
-      if (this.get('hideElhideement.right.hit')) classes.push('ks-hide-right-hit')
+      if (this.get('hide.right.hit')) classes.push('ks-hide-right-hit')
       if (this.get('hide.right.sec_recommend')) classes.push('ks-hide-right-sec-recommend')
       if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
     }

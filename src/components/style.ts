@@ -8,16 +8,33 @@ const template =  /* less */`
   @font-serif: {font_family_serif};
   @font-monospace: {font_family_monospace};
 
+  @color-primary: #4A56A8;
+  @color-primary-dark: #23284f;
+  @color-primary-darker: #171a33;
+
+  .ks-clearfix {
+    &:after {
+      display: table;
+      clear: both;
+      content: '';
+    }
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+  }
+
   body,
   .gall_list,
   button, input, select, table, textarea {
     font-family: @font-sans;
   }
 
-  /* 앱 */
   body {
-    &.ks-hide-logo .dc_logo { opacity: 0 }
-
+    &.ks-hide-logo .dc_logo {
+      visibility: hidden;
+    }
     &.ks-hide-title .left_content header {
       display: none
     }
@@ -83,7 +100,90 @@ const template =  /* less */`
     }
   }
 
+  #ks-nav {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1100px;
+    list-style-type: none;
+    color: white;
+  
+    .ks-nav-item {
+      padding: 1em 2em;
+      cursor: pointer;
+    }
+  }
+
+  #ks-config {
+    transition: opacity .25s;
+    z-index: 500;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    cursor: pointer;
+
+    > div {
+      overflow: hidden;
+      overflow-y: auto;
+      width: 100%;
+      min-width: 400px;
+      max-width: 600px;
+      height: 100%;
+      min-height: 300px;
+      max-height: 80%;
+      border-radius: 5px;
+      background: @color-primary-dark;
+      box-shadow: 0 0 100% black;
+      color: white;
+      cursor: initial;
+    }
+
+    .ks-config-item {
+      box-sizing: border-box;
+      padding: 0.5em 1em;
+      
+      &:nth-child(even) {
+        background: rgba(0, 0, 0, .15);
+      }
+    }
+
+    .ks-config-key {
+      display: block;
+      width: 100%;
+
+      label {
+        float: left;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      > input {
+        float: right;
+        display: inline-block;
+        border: 1px solid rgba(0, 0, 0, .15);
+        background: @color-primary-dark;
+        font-family: @font-monospace;
+        color: white;
+      }
+
+      .ks-clearfix();
+    }
+    
+    &.ks-active {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
   #ks-preview {
+    transition: opacity .25s;
     z-index: 1000;
     position: absolute;
     top: 0;
@@ -91,7 +191,7 @@ const template =  /* less */`
     overflow: hidden;
     overflow-y: auto;
     transition: opacity .25s;
-    display: none;
+    visibility: hidden;
     padding: 1em;
     max-width: 500px;
     max-height: 250px;
@@ -114,7 +214,7 @@ const template =  /* less */`
     }
 
     &.ks-active {
-      display: inline-block;
+      visibility: visible;
       opacity: .85;
     }
   }
@@ -145,7 +245,7 @@ const template =  /* less */`
 `
 
 const componentStyle: Component = {
-  onCreate () {
+  create () {
     const style = createElement('<style id="ks-style" type="text/less"></style>')
     style.innerHTML = format(template, config.get('style'))
     document.head.append(style)
@@ -156,7 +256,7 @@ const componentStyle: Component = {
 
     less.refresh()
   },
-  onDestroy () {
+  destroy () {
     document.querySelector('#ks-style')?.remove()
   }
 }
