@@ -80,7 +80,7 @@ class Cache extends Array<CacheSet> {
 
     // 캐시가 최대 수에 도달하면 마지막 아이템 한개씩 제거하기
     if (this.length > config.get<number>('live.cache')) {
-      this.pop()
+      this.shift()
     }
 
     this.sync()

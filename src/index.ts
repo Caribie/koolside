@@ -13,7 +13,6 @@ async function main () {
   const gallery = getParameter('id')
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
-  componentStyle.create()
   componentConfig.create()
   componentNav.create()
   componentPreview.create()
@@ -83,9 +82,10 @@ async function main () {
 
 // 최상단 페이지에서만 스크립트 실행하기
 if (window.top === window.self) {
+  componentStyle.create()
 
   // 갤러리 테이블 요소 대기 후 main() 실행하기
-  tryAndWaitForTheElement('.copyright')
+  tryAndWaitForTheElement('.gall_list')
     .catch(() => console.error('페이지에서 게시글 테이블 요소를 불러올 수 없습니다'))
     .then(() => main())
     .catch(console.error)
