@@ -51,7 +51,7 @@ const template =  /* less */`
 
     /* 타이틀 */
     &.ks-hide-title {
-      .wrap_inner header,
+      .wrap_inner .page_head,
       .left_content header {
         display: none;
       }

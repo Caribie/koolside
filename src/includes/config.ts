@@ -1,17 +1,31 @@
 import Storage from './storage'
+import timer from './timer'
 
-function generateDefaultValeus (details: LooseObject, map?: (key: string, value: Storable) => void) {
+function generateDefaultValues (details: LooseObject, map?: (key: string, value: Storable) => void) {
   const result = {} as LooseObject
 
   for (let key in details) {
     const detail = details[key]
-    result[key] = detail.items ? generateDefaultValeus(detail.items, map) : detail.default
+    result[key] = detail.items ? generateDefaultValues(detail.items, map) : detail.default
   }
 
   return result
 }
 
 export const details = {
+  live: {
+    name: '자동 새로고침',
+    items: {
+      delay: {
+        name: '새로고침 시간 (초)',
+        default: 1
+      },
+      cache: {
+        name: '최대 캐시 수',
+        default: 1000
+      }
+    }
+  },
   hide: {
     name: '숨길 요소',
     items: {
@@ -106,7 +120,7 @@ export const details = {
   }
 }
 
-const defaultValue = generateDefaultValeus(details)
+const defaultValue = generateDefaultValues(details)
 
 const config = new Storage('config', {
   defaultValue,
@@ -130,6 +144,8 @@ const config = new Storage('config', {
       if (this.get('hide.right.sec_recommend')) classes.push('ks-hide-right-sec-recommend')
       if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
     }
+
+    timer()
 
     document.body.setAttribute('class', classes.join(' '))
   }

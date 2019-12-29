@@ -22,6 +22,15 @@ function generateItems (details: LooseObject, key?: string) {
       let html = ''
 
       switch (typeof item.default) {
+        case 'number':
+          html = /* html */`
+            <label>${item.name}</label>
+            <input 
+              type="number"
+              value="${config.get<number>(currentKey)}"
+              data-key="${currentKey}">
+          `
+          break
         case 'string':
           html = /* html */`
             <label>${item.name}</label>

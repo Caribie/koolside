@@ -11,4 +11,6 @@ export function getParameter (key: string) {
   return params[key] as string
 }
 
-export const BODY_PATTERN = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
+export function range (value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}

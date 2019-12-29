@@ -1,4 +1,3 @@
-import pLimit from 'p-limit'
 import { tryAndWaitForTheElement } from 'wait-for-the-element'
 
 import componentConfig from './components/config'
@@ -10,9 +9,9 @@ import config from './includes/config'
 import { fetchList } from './includes/request'
 import { getParameter } from './includes/utils'
 
-const gallery = getParameter('id')
-
 async function main () {
+  const gallery = getParameter('id')
+
   // 설정 맞추기
   config.sync()
 
@@ -22,43 +21,47 @@ async function main () {
   componentNav.create()
   componentPreview.create()
 
-  const preview = document.querySelector('#ks-preview') as HTMLElement
+  // 마우스 이벤트 추가하기
+  const body = document.body
+  const preview = document.querySelector<HTMLElement>('#ks-preview')
 
-  function onMouseEvent (e: MouseEvent) {
-    let el = e.target as HTMLElement
+  document.addEventListener('mousemove', e => {
+    let target = e.target as HTMLElement
 
     // 게시글 목록 요소인지 확인하기
-    while (el !== null) {
+    while (target !== null) {
       // 프리뷰 객체라면 프리뷰 박스 내에서 스크롤 해야하므로 무시하기
-      if (el === preview) {
-        document.body.classList.add('ks-prevent-scrolling')
+      if (target === preview) {
+        body.classList.add('ks-prevent-scrolling')
         break
       } else {
-        document.body.classList.remove('ks-prevent-scrolling')
+        body.classList.remove('ks-prevent-scrolling')
       }
 
-      if (el.classList && el.classList.contains('us-post')) {
+      if (target.classList && target.classList.contains('us-post')) {
         break
       }
 
-      el = el.parentNode as HTMLElement
+      target = target.parentNode as HTMLElement
     }
-  
-    if (el) {
-      const no = parseInt(el.dataset.no, 10)
+
+    if (target) {
+      const currentPost = parseInt(preview.dataset.no, 10)
+      const post = parseInt(target.dataset.no, 10)
 
       // 현재 프리뷰가 선택한 게시글이 아니라면 업데이트하기
-      if (cache.has(no) && preview.dataset.no !== el.dataset.no) {
+      if (currentPost !== post && cache.has(gallery, post)) {
+
+        // 프리뷰 표시될 크기와 위치 구하기
         const scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
         const clientTop = document.body.clientTop || document.documentElement.clientTop || 0
-
-        const rect = el.getBoundingClientRect()
+        const rect = target.getBoundingClientRect()
         const top = rect.top + scrollTop - clientTop
 
         preview.style.top = `${top}px`
         preview.style.left = `${e.pageX + 25}px`
-        preview.dataset.no = el.dataset.no
-        preview.innerHTML = cache.get(no).innerHTML
+        preview.dataset.no = target.dataset.no
+        preview.innerHTML = cache.get(gallery, post) as string
         preview.classList.add('ks-active')
 
         for (let img of preview.querySelectorAll('img')) {
@@ -73,44 +76,9 @@ async function main () {
       preview.innerHTML = ''
       delete preview.dataset.no
     }
-  }
+  })
 
-  document.body.prepend(preview)
-
-  document.addEventListener('mousemove', onMouseEvent)
-  // document.addEventListener('mousewheel', onMouseEvent)
-  // document.addEventListener('DOMMouseScroll', onMouseEvent) // for our firefox friends :)
-
-  const promises = []
-  const limit = pLimit(10)
-
-  for (let el of document.querySelectorAll<HTMLElement>('.us-post')) {
-    // 번호 없는 글은 무시하기
-    if (!el.dataset.no) {
-      console.log(el)
-      continue
-    }
-
-    // 공지 게시글은 무시하기
-    if (el.dataset.type === 'icon_notice') {
-      continue
-    }
-
-    const no = parseInt(el.dataset.no, 10)
-
-    try {
-      const promise = limit(() => cache.fetchPost(gallery, no))
-      promises.push(promise)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  // 현재 불러온 게시글 전체 캐싱하기
-  await Promise.all(promises)
-
-  // 게시글 실시간 업데이트 시작하기
-  setInterval(() => fetchList(gallery), 1000)
+  await fetchList(gallery, document.body.outerHTML)
 }
 
 // 최상단 페이지에서만 스크립트 실행하기

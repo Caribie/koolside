@@ -1,47 +1,90 @@
-import request from './request'
-import { BODY_PATTERN,createElement } from './utils'
+import config from "./config"
 
-class Cache extends Map<number, Element> {
-  async fetchPost (gallery: string, no: number) {
-    const url = `https://m.dcinside.com/board/${gallery}/${no}`
-    const res = await request({
-      url,
-      headers: {
-        'user-agent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.114 Mobile Safari/537.36'
-      }
-    })
-  
-    // body 태그 속만 불러오기
-    const matches = res.responseText.match(BODY_PATTERN)
-    const $ = createElement(matches.groups.body).parentNode
-  
-    // 필요없는 태그 제거하기
-    const content = $.querySelector('.thum-txtin')
-    const query = '*:not(img):not(iframe):not(br):empty'
-  
-    for (let e of content.querySelectorAll(query)) {
-      e.remove()
-    }
-  
-    // 모든 이미지 원본 주소로 변환하기
-    for (let img of content.querySelectorAll('img')) {
-      const src = img.dataset.original || img.src
-  
-      while (img.attributes.length) {
-        img.removeAttribute(img.attributes[0].name)
-      }
-  
-      img.src = src
-    }
- 
-    // 캐싱하기
-    this.set(no, content)
-  
-    return content
+interface CacheSet {
+  id: string;
+  post: number;
+  html: string;
+}
+
+class Cache extends Array<CacheSet> {
+  constructor () {
+    super()
+    
+    // 확장 기능에 저장된 캐시 불러오기
+    this.push(...GM_getValue<CacheSet[]>('cache', []))
   }
 
-  fetchPosts (gallery: string, posts: number[]) {
-    return posts.map(no => this.fetchPost(gallery, no))
+  /**
+   * 확장 기능의 저장 공간에 캐시를 저장합니다
+   */
+  sync () {
+    GM_setValue('cache', this)
+  }
+
+  /**
+   * 캐시된 게시글의 인덱스 번호를 가져옵니다
+   * @param id 갤러리 아이디
+   * @param post 게시글 번호
+   */
+  indexOfElement (id: string, post: number) {
+    for (let i = 0; i < this.length; i++) {
+      const item = this[i]
+      if (item.id === id && item.post === post) {
+        return i
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * 게시글이 캐시됐는지 확인합니다
+   * @param id 갤러리 아이디
+   * @param post 게시글 번호
+   */
+  has (id: string, post: number) {
+    return typeof this.indexOfElement(id, post) === 'number'
+  }
+
+  /**
+   * 캐시된 게시글을 HTMLElement 객체로 가져옵니다
+   * @param id 갤러리 아이디
+   * @param post 게시글 번호
+   */
+  get (id: string, post: number) {
+    const idx = this.indexOfElement(id, post)
+
+    if (idx) {
+      return this[idx].html
+    }
+
+    return false
+  }
+
+  /**
+   * HTMLElement 객체를 캐시한 뒤 인덱스 번호를 반환합니다
+   * @param id 갤러리 아이디
+   * @param post 게시글 번호
+   * @param element HTMLElement 객체
+   */
+  set (id: string, post: number, element: HTMLElement) {
+    const html = element.outerHTML
+    let idx = this.indexOfElement(id, post)
+
+    if (idx) {
+      this[idx].html = html
+      return idx
+    } else {
+      idx = this.push({ id, post, html })
+    }
+
+    // 캐시가 최대 수에 도달하면 마지막 아이템 한개씩 제거하기
+    if (this.length > config.get<number>('live.cache')) {
+      this.pop()
+    }
+
+    this.sync()
+    return idx
   }
 }
 
