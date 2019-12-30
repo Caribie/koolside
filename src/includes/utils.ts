@@ -19,7 +19,7 @@ export function getCookie (key: string) {
 }
 
 export function hasAdminPermission () {
-  return !!document.querySelector('.btn_useradmin_go')
+  return !!document.querySelector('#minor_th-tmpl')
 }
 
 export function range (value: number, min: number, max: number) {
