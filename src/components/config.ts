@@ -116,7 +116,7 @@ const componentConfig: Component = {
     })
 
     // 캐시 삭제 버튼 이벤트
-    document.querySelector('#ks-btn-deletecache')?.addEventListener('click', e => {
+    document.querySelector('#ks-btn-deletecache')?.addEventListener('click', () => {
       cache.reset()
     })
 

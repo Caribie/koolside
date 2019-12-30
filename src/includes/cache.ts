@@ -9,9 +9,15 @@ interface CacheSet {
 class Cache extends Array<CacheSet> {
   constructor () {
     super()
+
+    let cache = GM_getValue<CacheSet[]>('cache', [])
+
+    if (!Array.isArray(cache)) {
+      cache = []
+    }
     
     // 확장 기능에 저장된 캐시 불러오기
-    this.push(...GM_getValue<CacheSet[]>('cache', []))
+    this.push(...cache)
   }
 
   reset () {
