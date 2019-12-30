@@ -16,13 +16,17 @@ export const details = {
   live: {
     name: '자동 새로고침',
     items: {
-      delay: {
-        name: '새로고침 시간 (초)',
+      interval: {
+        name: '새로고침 간격 (초)',
         default: 1
       },
-      cache: {
-        name: '최대 캐시 수',
+      limit_cache: {
+        name: '캐시 수',
         default: 1000
+      },
+      limit_items: {
+        name: '게시글 수',
+        default: 50
       }
     }
   },

@@ -1,6 +1,7 @@
 import pLimit from 'p-limit'
 
 import cache from './cache'
+import config from './config'
 import { createElement } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
@@ -116,9 +117,9 @@ export async function fetchPosts (gallery: string, posts: number[]) {
 }
 
 export async function fetchList (gallery: string, html?: string) {
-  const override = !html
+  const custom = !html
 
-  if (override) {
+  if (custom) {
     const res = await request(location.href)
     html = res.responseText
   }
@@ -136,7 +137,7 @@ export async function fetchList (gallery: string, html?: string) {
   const newPosts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const addedPosts = []
 
-  const table = document.querySelector('.gall_list tbody')
+  const tbody = document.querySelector('.gall_list tbody')
   const hasCheckbox = document.querySelector('.chkbox_th') !== null
 
   for (let newPost of newPosts) {
@@ -165,12 +166,21 @@ export async function fetchList (gallery: string, html?: string) {
     }
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
-    if (!cache.has(gallery, post)) {
+    if (!document.querySelector(`.us-post[data-no="${post}"]`) && !cache.has(gallery, post)) {
 
       // 직접 HTML 코드를 전달받지 않았다면 목록에 추가하기
-      if (override) {
+      if (custom) {
         newPost.classList.add('ks-new')
-        table.prepend(newPost)
+        tbody.prepend(newPost)
+
+        // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
+        const overflow = tbody.childElementCount - config.get<number>('live.limit_items')
+
+        console.log(overflow)
+        
+        for (let i = 0; i < overflow; i++) {
+          tbody.lastChild.remove()
+        }
       }
 
       addedPosts.push(post)

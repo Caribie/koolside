@@ -78,7 +78,7 @@ class Cache extends Array<CacheSet> {
       idx = this.push({ id, post, html })
     
       // 캐시가 최대 수에 도달하면 마지막 아이템 한개씩 제거하기
-      if (this.length > config.get<number>('live.cache')) {
+      if (this.length > config.get<number>('live.limit_cache')) {
         this.shift()
       }
     }

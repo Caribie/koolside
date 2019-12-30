@@ -9,7 +9,7 @@ let interval: NodeJS.Timeout
  */
 export default function timer () {
   const gallery = getParameter('id')
-  const delay = range(config.get<number>('live.delay'), 0.5, 30) * 1000
+  const delay = range(config.get<number>('live.interval'), 0.5, 30) * 1000
 
   if (interval) {
     clearInterval(interval)

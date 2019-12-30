@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
   const sans = argv.mode !== 'production' // is sans enabled? if it say WAHHHHH!!
 
   const mode = sans ? 'development' : 'production'
-  const devtool = sans ? 'inline-source-map' : ''
+  const devtool = sans ? 'cheap-module-eval-source-map' : ''
   const filename = sans ? 'debug.user.js' : 'lib.user.js'
 
   const metadata = stripIndent`
