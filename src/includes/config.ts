@@ -9,7 +9,10 @@ export const set: ConfigSet = {
     set: {
       interval: {
         name: '새로고침 간격 (초)',
-        default: 1
+        default: 1,
+        onChange() {
+          timer()
+        }
       },
       thread: {
         name: '스레드',
@@ -195,8 +198,6 @@ const config = new Storage('config', {
         if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
       }
     }
-
-    timer()
 
     document.body.setAttribute('class', classes.join(' '))
   }

@@ -87,18 +87,26 @@ const componentConfig: Component = {
 
     function update (this: HTMLInputElement) {
       const key = this.dataset.key
-      let value
+      const oldValue = config.get(key)
 
-      switch (typeof config.get(key)) {
-        case 'boolean':
-          value = this.checked
-          break
-        default:
-          value = this.value
+      let newValue
+
+      if (typeof oldValue === 'boolean') {
+        newValue = this.checked
+      } else {
+        newValue = this.value
       }
 
-      config.set(key, value)
-      config.sync()
+      if (oldValue !== newValue) {
+        // 변경시 실행할 함수가 있다면 실행하기
+        const onChange = configOption<Function>(key, 'onChange')
+        if (onChange) {
+          onChange(oldValue, newValue)
+        }
+
+        config.set(key, newValue)
+        config.sync()
+      }
 
       // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
       if (key.startsWith('style')) {
