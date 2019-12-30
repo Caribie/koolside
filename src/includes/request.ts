@@ -149,7 +149,8 @@ export async function fetchList (gallery: string, html?: string) {
   const tbody = document.querySelector('.gall_list tbody')
   const isAdmin = document.querySelector('.chkbox_th') !== null
 
-  const addedPosts = []
+  const numbers = []
+  const addedNumbers = []
 
   for (let post of posts) {
     // 공지 글은 무시하기
@@ -184,33 +185,35 @@ export async function fetchList (gallery: string, html?: string) {
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
     if (!isCached) {
-      addedPosts.push(number)
+      addedNumbers.push(number)
     }
+
+    numbers.push(number)
   }
 
   // 삭제된 글이라면 삭제 클래스 붙여주기
-  const lowest = Math.min(...addedPosts)
+  let count = 0
 
   for (let post of tbody.querySelectorAll('tr') as NodeListOf<HTMLElement>) {
     const no = parseInt(post.dataset.no, 10)
 
     // 방금 가져온 글 목록의 마지막 글 번호보다 적으면 확인할 수 없으므로 끝내기
-    if (no < lowest) {
+    if (count++ >= posts.length) {
       break
     }
 
-    if (!addedPosts.includes(no)) {
+    if (!numbers.includes(no)) {
       post.classList.add('ks-deleted')
     }
   }
 
   // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
   const limit = config.get<number>('live.limit_items')
-  const count = tbody.querySelectorAll('tr:not([data-type="icon_notice"])').length
+  const postCount = tbody.querySelectorAll('tr:not([data-type="icon_notice"])').length
 
-  for (let i = 1, len = count - limit; i <= len; i++) {
+  for (let i = 1, len = postCount - limit; i <= len; i++) {
     tbody.lastElementChild.remove()
   }
 
-  await fetchPosts(gallery, addedPosts)
+  await fetchPosts(gallery, addedNumbers)
 }
