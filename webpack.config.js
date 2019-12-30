@@ -14,6 +14,9 @@ module.exports = (env, argv) => {
   // ==UserScript==
   // @name          koolside
   // @namespace     https://github.com/toriato/koolside
+  // @downloadURL   https://github.com/toriato/koolside/raw/master/dist/lib.user.js
+  // @supportURL    https://github.com/toriato/koolside/issues
+  // @homepageURL   https://github.com/toriato/koolside
   // @version       ${package.version}
   // @author        ${package.author}
   // @description   ${package.description}
