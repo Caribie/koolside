@@ -1,30 +1,30 @@
-import config, { details } from "../includes/config"
+import config, { dataset } from "../includes/config"
 import { createElement } from "../includes/utils"
 import componentStyle from "./style"
 
-function generateItems (details: LooseObject, key?: string) {
+function generateItems (dataset: LooseObject, key?: string) {
   const result = [] as string[]
   
   key = key || ''
 
-  for (let k in details) {
-    const item = details[k]
+  for (let k in dataset) {
+    const data = dataset[k]
 
-    if (item.items) {
+    if (data.items) {
       // 카테고리라면 헤더와 하위 아이템 추가하기
       const i = 2 + (key.match(/\./g) || []).length
-      result.push(`<h${i} class="ks-config-item">${item.name}</h${i}>`)
-      result.push(...generateItems(item.items, `${key}${k}.`))
+      result.push(`<h${i} class="ks-config-item">${data.name}</h${i}>`)
+      result.push(...generateItems(data.items, `${key}${k}.`))
     } else {
       // 아이템 추가하기
       const currentKey = `${key}${k}`
 
       let html = ''
 
-      switch (typeof item.default) {
+      switch (typeof data.default) {
         case 'number':
           html = /* html */`
-            <label>${item.name}</label>
+            <label>${data.name}</label>
             <input 
               type="number"
               value="${config.get<number>(currentKey)}"
@@ -33,7 +33,7 @@ function generateItems (details: LooseObject, key?: string) {
           break
         case 'string':
           html = /* html */`
-            <label>${item.name}</label>
+            <label>${data.name}</label>
             <input 
               type="text"
               value="${config.get<string>(currentKey).replace(/"/g, '&quot;')}"
@@ -47,7 +47,7 @@ function generateItems (details: LooseObject, key?: string) {
                 type="checkbox" 
                 data-key="${currentKey}"
                 ${config.get<number>(currentKey) ? 'checked' : ''}>
-              <span>${item.name}</span>
+              <span>${data.name}</span>
             </label>
           `
           break
@@ -70,7 +70,7 @@ const componentConfig: Component = {
       <div id="ks-config">
         <div>
           <h1>설정</h1>
-          ${generateItems(details).join('\n')}
+          ${generateItems(dataset).join('\n')}
         </div>
       </div>
     `)

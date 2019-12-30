@@ -134,63 +134,55 @@ export async function fetchList (gallery: string, html?: string) {
   // 필요없는 글은 삭제하기
   const $ = createElement(matches.groups.body).parentNode
 
-  const newPosts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const addedPosts = []
-
+  const posts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const tbody = document.querySelector('.gall_list tbody')
-  const hasCheckbox = document.querySelector('.chkbox_th') !== null
 
-  for (let newPost of newPosts) {
-    switch (true) {
-      case newPost.dataset.type === 'icon_notice':
-        continue
+  const isAdmin = document.querySelector('.chkbox_th') !== null
+
+  for (let post of posts) {
+
+    // 공지 글은 삭제하기
+    if (post.dataset.type === 'icon_notice') {
+      continue
     }
 
-    const post = parseInt(newPost.dataset.no, 10)
+    const number = parseInt(post.dataset.no, 10)
 
     // 관리용 체크박스가 필요하다면 붙이기
-    if (hasCheckbox) {
-      newPost.prepend(checkboxTemplate)
+    if (isAdmin) {
+      post.prepend(checkboxTemplate)
     }
 
     // 기존 글 댓글 수, 조회 수 등 업데이트
-    const cachedPost = document.querySelector(`.us-post[data-no="${newPost.dataset.no}"]`) 
+    const cachedPost = tbody.querySelector(`[data-no="${post.dataset.no}"]`) 
     if (cachedPost) {
 
-      if (hasCheckbox) {
+      if (isAdmin) {
         const checked = cachedPost.querySelector<HTMLInputElement>('.gall_chk input').checked
-        newPost.querySelector<HTMLInputElement>('.gall_chk input').checked = checked
+        post.querySelector<HTMLInputElement>('.gall_chk input').checked = checked
       }
 
-      cachedPost.innerHTML = newPost.innerHTML
+      cachedPost.innerHTML = post.innerHTML
     }
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
-    if (!document.querySelector(`.us-post[data-no="${post}"]`) && !cache.has(gallery, post)) {
+    if (!tbody.querySelector(`[data-no="${number}"]`) && !cache.has(gallery, number)) {
 
       // 직접 HTML 코드를 전달받지 않았다면 목록에 추가하기
       if (custom) {
-        newPost.classList.add('ks-new')
-        tbody.prepend(newPost)
-
-        // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
-        const overflow = tbody.childElementCount - config.get<number>('live.limit_items')
-
-        console.log(overflow)
-        
-        for (let i = 0; i < overflow; i++) {
-          tbody.lastChild.remove()
-        }
+        post.classList.add('ks-new')
+        tbody.prepend(post)
       }
 
-      addedPosts.push(post)
+      addedPosts.push(number)
     }
   }
 
   // 삭제된 글이라면 삭제 클래스 붙여주기
   const lowest = Math.min(...addedPosts)
 
-  for (let post of document.querySelectorAll('.us-post') as NodeListOf<HTMLElement>) {
+  for (let post of tbody.querySelectorAll('tr') as NodeListOf<HTMLElement>) {
     const no = parseInt(post.dataset.no, 10)
 
     // 방금 가져온 글 목록의 마지막 글 번호보다 적으면 확인할 수 없으므로 끝내기
@@ -201,6 +193,14 @@ export async function fetchList (gallery: string, html?: string) {
     if (!addedPosts.includes(no)) {
       post.classList.add('ks-deleted')
     }
+  }
+
+  // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
+  const limit = config.get<number>('live.limit_items')
+  const count = tbody.querySelectorAll('tr:not([data-type="icon_notice"])').length
+
+  for (let i = 1, len = count - limit; i <= len; i++) {
+    tbody.lastElementChild.remove()
   }
 
   await fetchPosts(gallery, addedPosts)

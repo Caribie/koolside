@@ -44,22 +44,30 @@ const template =  /* less */`
       }
     }
 
-    /* 로고 */
+    /* 갤러리 */
     &.ks-hide-logo .dc_logo {
       visibility: hidden;
     }
-
-    /* 타이틀 */
     &.ks-hide-title {
       .wrap_inner .page_head,
       .left_content header {
         display: none;
       }
     }
-
-    /* 타이틀 바 */
-    &.ks-hide-titlebar .left_content article:nth-child(2) {
-      display: none;
+    &.ks-hide-titlebar {
+      .left_content article:nth-child(2) {
+        display: none;
+      }
+    }
+    &.ks-hide-history {
+      .visit_history {
+        display: none;
+      }
+    }
+    &.ks-hide-notice {
+      [data-type=icon_notice] {
+        display: none;
+      }
     }
 
     &.ks-hide-right {

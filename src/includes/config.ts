@@ -1,18 +1,9 @@
+import dotProp from 'dot-prop'
+
 import Storage from './storage'
 import timer from './timer'
 
-function generateDefaultValues (details: LooseObject, map?: (key: string, value: Storable) => void) {
-  const result = {} as LooseObject
-
-  for (let key in details) {
-    const detail = details[key]
-    result[key] = detail.items ? generateDefaultValues(detail.items, map) : detail.default
-  }
-
-  return result
-}
-
-export const details = {
+export const dataset = {
   live: {
     name: '자동 새로고침',
     items: {
@@ -41,13 +32,26 @@ export const details = {
         name: '웹 사이트 로고',
         default: false
       },
-      title: {
-        name: '갤러리 제목',
-        default: false
-      },
-      titlebar: {
-        name: '갤러리 정보',
-        default: false
+      gallery: {
+        name: '갤러리',
+        items: {
+          title: {
+            name: '제목',
+            default: false
+          },
+          titlebar: {
+            name: '정보',
+            default: false
+          },
+          history: {
+            name: '최근 방문 갤러리',
+            default: false
+          },
+          notice: {
+            name: '공지 게시글',
+            default: true
+          }
+        }
       },
       right: {
         name: '우측 사이드 바',
@@ -124,19 +128,43 @@ export const details = {
   }
 }
 
-const defaultValue = generateDefaultValues(details)
+/**
+ * 설정 옵션 값을 가져옵니다 (name, default 등)
+ * @param key 설정 키
+ * @param option 설정 옵션
+ */
+function option<T> (key: string, option: string) {
+  return dotProp.get<T>(dataset, `${key.replace(/\./g, '.items.')}.${option}`)
+}
+
+/**
+ * 
+ * @param dataset 설정 데이터
+ */
+function defaultValue (dataset: LooseObject) {
+  const result = {} as LooseObject
+
+  for (let k in dataset) {
+    const data = dataset[k]
+    result[k] = data.items ? defaultValue(data.items) : data.default
+  }
+
+  return result
+}
 
 const config = new Storage('config', {
-  defaultValue,
+  defaultValue: defaultValue(dataset),
   onSync () {
     const classes = []
 
     if (this.get('hide.ad')) classes.push('ks-hide-ad')
     if (this.get('hide.logo')) classes.push('ks-hide-logo')
-    if (this.get('hide.title')) classes.push('ks-hide-title')
-    if (this.get('hide.titlebar')) classes.push('ks-hide-titlebar')
 
     if (location.href.startsWith('https://gall.dcinside.com/')) {
+      if (this.get('hide.gallery.title')) classes.push('ks-hide-title')
+      if (this.get('hide.gallery.titlebar')) classes.push('ks-hide-titlebar')
+      if (this.get('hide.gallery.notice')) classes.push('ks-hide-notice')
+
       if (this.get('hide.right.all')) {
         classes.push('ks-hide-right')
       } else {
