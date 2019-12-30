@@ -1,4 +1,5 @@
 import pLimit from 'p-limit'
+import pRetry from 'p-retry'
 
 import cache from './cache'
 import config from './config'
@@ -44,6 +45,9 @@ export default function request (opts: string | GM_RequestInfo) {
  * @param post 게시글 번호
  */
 export async function fetchPost (gallery: string, post: number) {
+  // 미리보기 대기 중 클래스 추가하기
+  document.querySelector(`tr[data-no="${post}"]`)?.classList.add('ks-loading')
+
   const res = await request({
     url: `https://m.dcinside.com/board/${gallery}/${post}`,
     headers: {
@@ -95,6 +99,9 @@ export async function fetchPost (gallery: string, post: number) {
   // 캐싱하기
   cache.set(gallery, post, content)
 
+  // 미리보기 대기 중 클래스 삭제하기
+  document.querySelector('.us-post.ks-loading')?.classList.remove('ks-loading')
+
   return content
 }
 
@@ -105,21 +112,27 @@ export async function fetchPost (gallery: string, post: number) {
  */
 export async function fetchPosts (gallery: string, posts: number[]) {
   const promises = []
-  const limit = pLimit(10)
+  const limit = pLimit(config.get<number>('live.thread'))
 
   for (let post of posts) {
-    const promise = limit(() => fetchPost(gallery, post).catch(console.error))
-    promises.push(promise)
+    const retries = config.get<number>('live.retries')
+    const promise = fetchPost(gallery, post)
+    promises.push(limit(() => pRetry(() => promise, { retries })))
   }
 
   // 현재 불러온 게시글 전체 캐싱하기
   await Promise.all(promises)
 }
 
+/**
+ * 게시글 목록을 불러온 뒤 처리합니다
+ * @param gallery 갤러리 아이디
+ * @param html 이미 처리된 HTML 코드
+ */
 export async function fetchList (gallery: string, html?: string) {
-  const custom = !html
+  const requireProcess = !html
 
-  if (custom) {
+  if (requireProcess) {
     const res = await request(location.href)
     html = res.responseText
   }
@@ -131,50 +144,46 @@ export async function fetchList (gallery: string, html?: string) {
     throw new Error('게시글 목록을 파싱하는데 실패했습니다')
   }
 
-  // 필요없는 글은 삭제하기
   const $ = createElement(matches.groups.body).parentNode
-
-  const addedPosts = []
   const posts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const tbody = document.querySelector('.gall_list tbody')
-
   const isAdmin = document.querySelector('.chkbox_th') !== null
 
-  for (let post of posts) {
+  const addedPosts = []
 
-    // 공지 글은 삭제하기
+  for (let post of posts) {
+    // 공지 글은 무시하기
     if (post.dataset.type === 'icon_notice') {
       continue
     }
-
-    const number = parseInt(post.dataset.no, 10)
 
     // 관리용 체크박스가 필요하다면 붙이기
     if (isAdmin) {
       post.prepend(checkboxTemplate)
     }
 
-    // 기존 글 댓글 수, 조회 수 등 업데이트
-    const cachedPost = tbody.querySelector(`[data-no="${post.dataset.no}"]`) 
-    if (cachedPost) {
+    const number = parseInt(post.dataset.no, 10)
+    const isCached = cache.has(gallery, number)
 
+    const listed = tbody.querySelector(`[data-no="${number}"]`)
+
+    if (listed) {
       if (isAdmin) {
-        const checked = cachedPost.querySelector<HTMLInputElement>('.gall_chk input').checked
-        post.querySelector<HTMLInputElement>('.gall_chk input').checked = checked
+        const checked = listed.querySelector('input').checked
+        post.querySelector('input').checked = checked
       }
 
-      cachedPost.innerHTML = post.innerHTML
+      // 제목이나 댓글, 조회 수 등이 변경됐다면 내용 교체하기
+      if (listed.innerHTML !== post.innerHTML) {
+        listed.innerHTML = post.innerHTML
+      }
+    } else if (!isCached) {
+      post.classList.add('ks-new')
+      tbody.prepend(post)
     }
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
-    if (!tbody.querySelector(`[data-no="${number}"]`) && !cache.has(gallery, number)) {
-
-      // 직접 HTML 코드를 전달받지 않았다면 목록에 추가하기
-      if (custom) {
-        post.classList.add('ks-new')
-        tbody.prepend(post)
-      }
-
+    if (!isCached) {
       addedPosts.push(number)
     }
   }

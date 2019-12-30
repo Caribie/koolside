@@ -34,20 +34,19 @@ const template =  /* less */`
   body {
     /* 광고 */
     &.ks-hide-ad {
-      .wrap_inner {
-        #ad-layer,
-        #zzbang_ad,
-        .rightbanner,
-        .ub-content.dory {
-          display: none;
-        }
+      #ad-layer,
+      #zzbang_ad,
+      .rightbanner,
+      .ub-content.dory {
+        display: none;
       }
     }
 
-    /* 갤러리 */
     &.ks-hide-logo .dc_logo {
       visibility: hidden;
     }
+
+    /* 갤러리 */
     &.ks-hide-title {
       .wrap_inner .page_head,
       .left_content header {
@@ -248,13 +247,17 @@ const template =  /* less */`
   }
 
   .us-post {
+    transition: opacity .25s;
+
     &.ks-new {
       animation-name: ks-new;
       animation-duration: .5s;
     }
-
     &.ks-deleted {
       background: rgb(240, 100, 100)
+    }
+    &.ks-loading {
+      opacity: .5;
     }
   }
 

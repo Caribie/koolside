@@ -21,6 +21,7 @@ module.exports = (env, argv) => {
   // @require       https://cdnjs.cloudflare.com/ajax/libs/less.js/3.10.3/less.min.js
   // @grant         GM_getValue
   // @grant         GM_setValue
+  // @grant         GM_deleteValue
   // @grant         GM_xmlhttpRequest
   // @run-at        document-start
   // ==/UserScript==

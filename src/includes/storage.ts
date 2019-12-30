@@ -11,9 +11,17 @@ export default class Storage {
   private storage: LooseObject
 
   constructor (key: string, opts?: StorageOptions) {
+    opts = opts || {}
+    opts.defaultValue = opts.defaultValue || {}
+
     this.key = key
-    this.opts = opts || {}
+    this.opts = opts
     this.storage = GM_getValue<LooseObject>(key, opts.defaultValue)
+  }
+
+  reset () {
+    GM_setValue(this.key, this.opts.defaultValue)
+    this.storage = this.opts.defaultValue
   }
 
   sync () {

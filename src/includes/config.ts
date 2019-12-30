@@ -3,27 +3,43 @@ import dotProp from 'dot-prop'
 import Storage from './storage'
 import timer from './timer'
 
-export const dataset = {
+export const set: ConfigSet = {
   live: {
     name: '자동 새로고침',
-    items: {
+    set: {
       interval: {
         name: '새로고침 간격 (초)',
         default: 1
       },
+      thread: {
+        name: '스레드',
+        default: 3,
+        min: 1,
+        max: 10
+      },
+      retries: {
+        name: '재시도 횟수',
+        default: 3,
+        min: 1,
+        max: 10
+      },
       limit_cache: {
-        name: '캐시 수',
-        default: 1000
+        name: '최대 캐시 수',
+        default: 1000,
+        min: 1000,
+        max: 100000
       },
       limit_items: {
-        name: '게시글 수',
-        default: 50
+        name: '최대 게시글 수',
+        default: 50,
+        min: 1,
+        max: 1000
       }
     }
   },
   hide: {
     name: '숨길 요소',
-    items: {
+    set: {
       ad: {
         name: '광고',
         default: true
@@ -34,7 +50,7 @@ export const dataset = {
       },
       gallery: {
         name: '갤러리',
-        items: {
+        set: {
           title: {
             name: '제목',
             default: false
@@ -55,7 +71,7 @@ export const dataset = {
       },
       right: {
         name: '우측 사이드 바',
-        items: {
+        set: {
           all: {
             name: '전체',
             default: false
@@ -98,7 +114,7 @@ export const dataset = {
   },
   style: {
     name: '사용자 스타일',
-    items: {
+    set: {
       font_family_sans: {
         name: '산세리프 글꼴',
         default: '"맑은 고딕", sans-serif'
@@ -119,7 +135,7 @@ export const dataset = {
   },
   debug: {
     name: '디버깅',
-    items: {
+    set: {
       less: {
         name :'Less',
         default: true
@@ -133,27 +149,28 @@ export const dataset = {
  * @param key 설정 키
  * @param option 설정 옵션
  */
-function option<T> (key: string, option: string) {
-  return dotProp.get<T>(dataset, `${key.replace(/\./g, '.items.')}.${option}`)
+export function configOption<T> (key: string, option: string) {
+  key = `${key.replace(/\./g, '.set.')}.${option}`
+  return dotProp.get<T>(set, key)
 }
 
 /**
  * 
- * @param dataset 설정 데이터
+ * @param set 설정 데이터
  */
-function defaultValue (dataset: LooseObject) {
+function defaultValue (set: ConfigSet) {
   const result = {} as LooseObject
 
-  for (let k in dataset) {
-    const data = dataset[k]
-    result[k] = data.items ? defaultValue(data.items) : data.default
+  for (let k in set) {
+    const config = set[k]
+    result[k] = 'set' in config ? defaultValue(config.set) : config.default
   }
 
   return result
 }
 
 const config = new Storage('config', {
-  defaultValue: defaultValue(dataset),
+  defaultValue: defaultValue(set),
   onSync () {
     const classes = []
 

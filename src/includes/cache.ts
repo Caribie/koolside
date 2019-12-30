@@ -14,6 +14,11 @@ class Cache extends Array<CacheSet> {
     this.push(...GM_getValue<CacheSet[]>('cache', []))
   }
 
+  reset () {
+    while (this.length) this.pop() // 놀랍게도 배열 지우기엔 제일 빠름
+    this.sync()
+  }
+
   /**
    * 확장 기능의 저장 공간에 캐시를 저장합니다
    */
