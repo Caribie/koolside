@@ -17,20 +17,23 @@ function onContextMenu (e: MouseEvent) {
     return
   }
 
-  if (context.classList.contains('ks-active') && target === context) {
+  if (target.closest('#ks-contextmenu') === context) {
+    // 컨텍스 메뉴 켜진 상태에서 한번 더 열었다면 네이티브 컨텍스 열기
     context.classList.remove('ks-active')
     return
   } else {
     context.classList.add('ks-active')
-    context.style.top = `${e.y - 1}px`
-    context.style.left = `${e.x - 1}px`
+
+    // 더블 클릭하기 쉽게 위치 이동하기
+    context.style.top = `${e.y - 5}px`
+    context.style.left = `${e.x - 5}px`
   }
 
   context.innerHTML = ''
 
   const items = []
 
-  // 아이템 새로 구성하기
+  // 관리 권한이 있을 때 추가될 메뉴
   if (hasAdminPermission()) {
     const post = target.closest<HTMLElement>('.us-post')
 
@@ -45,6 +48,7 @@ function onContextMenu (e: MouseEvent) {
       })
     }
 
+    // 선택한 게시글 번호만 불러오기
     const selectedPosts = [] as string[]
 
     for (let post of document.querySelectorAll<HTMLElement>('.us-post')) {
