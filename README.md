@@ -1,7 +1,7 @@
 # koolside
 
 <p align="center">
-  <a href="https://github.com/toriato/koolside/raw/master/dist/lib.user.js)"><img src="docs/logo.png" alt="KOOLSIDE"></a>
+  <a href="https://github.com/toriato/koolside/raw/master/dist/lib.user.js"><img src="docs/logo.png" alt="KOOLSIDE"></a>
   <a href="https://github.com/toriato/koolside/actions?query=workflow%3A%22Node+CI%22">
     <img src="https://github.com/toriato/koolside/workflows/Node%20CI/badge.svg" alt="Node CI">
   </a>
