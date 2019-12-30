@@ -3,7 +3,7 @@ import pRetry from 'p-retry'
 
 import cache from './cache'
 import config from './config'
-import { createElement } from './utils'
+import { createElement, hasAdminPermission } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
 
@@ -147,7 +147,6 @@ export async function fetchList (gallery: string, html?: string) {
   const $ = createElement(matches.groups.body).parentNode
   const posts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
   const tbody = document.querySelector('.gall_list tbody')
-  const isAdmin = document.querySelector('.chkbox_th') !== null
 
   const numbers = []
   const addedNumbers = []
@@ -158,33 +157,28 @@ export async function fetchList (gallery: string, html?: string) {
       continue
     }
 
-    // 관리용 체크박스가 필요하다면 붙이기
-    if (isAdmin) {
-      post.prepend(checkboxTemplate)
+    const number = parseInt(post.dataset.no, 10)
+    const cached = cache.has(gallery, number)
+
+    const old = tbody.querySelector(`[data-no="${number}"]`)
+
+    // 새 글이고 관리 권한이 있다면 글 앞에 체크박스 넣기
+    if (!old && hasAdminPermission()) {
+      post.prepend(checkboxTemplate.cloneNode(true))
     }
 
-    const number = parseInt(post.dataset.no, 10)
-    const isCached = cache.has(gallery, number)
-
-    const listed = tbody.querySelector(`[data-no="${number}"]`)
-
-    if (listed) {
-      if (isAdmin) {
-        const checked = listed.querySelector('input').checked
-        post.querySelector('input').checked = checked
-      }
-
+    if (old) {
       // 제목이나 댓글, 조회 수 등이 변경됐다면 내용 교체하기
-      if (listed.innerHTML !== post.innerHTML) {
-        listed.innerHTML = post.innerHTML
+      for (let td of post.querySelectorAll('td')) {
+        old.querySelector(`[class="${td.className}"]`).innerHTML = td.innerHTML
       }
-    } else if (!isCached) {
+    } else if (!cached) {
       post.classList.add('ks-new')
       tbody.prepend(post)
     }
 
     // 캐시되지 않은 글이라면 캐시하기 추가하기
-    if (!isCached) {
+    if (!cached) {
       addedNumbers.push(number)
     }
 
@@ -204,6 +198,7 @@ export async function fetchList (gallery: string, html?: string) {
 
     if (!numbers.includes(no)) {
       post.classList.add('ks-deleted')
+      post.querySelector('input')?.remove() // 체크박스 지우기
     }
   }
 

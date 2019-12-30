@@ -128,21 +128,38 @@ const template =  /* less */`
   }
 
   #ks-nav {
-    margin: 0 auto;
     width: 100%;
-    max-width: 1100px;
     list-style-type: none;
+    background: @color-primary;
     color: white;
+
+    > ul {
+      margin: 0 auto;
+      display: block;
+      max-width: 1100px;
+    }
   
     .ks-nav-item {
+      transition: background .25s;
+      display: inline-block;
       padding: 1em 2em;
       cursor: pointer;
+    }
+    .ks-nav-item:hover {
+      background: rgba(0, 0, 0, .25)
+    }
+
+    &.ks-nav-fixed {
+      z-index: 500;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
   }
 
   #ks-config {
     transition: opacity .25s;
-    z-index: 500;
+    z-index: 1000;
     position: fixed;
     top: 0;
     left: 0;

@@ -11,6 +11,17 @@ export function getParameter (key: string) {
   return params[key] as string
 }
 
+export function getCookie (key: string) {
+  const value = `;${document.cookie}`
+  const parts = value.split(`;${key}=`)
+  
+  return parts.length === 2 ? parts.pop().split(';').shift() : false
+}
+
+export function hasAdminPermission () {
+  return !!document.querySelector('.btn_useradmin_go')
+}
+
 export function range (value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
