@@ -125,10 +125,6 @@ const defaultValue = generateDefaultValues(details)
 const config = new Storage('config', {
   defaultValue,
   onSync () {
-    if (!location.href.startsWith('https://gall.dcinside.com/')) {
-      return
-    }
-
     const classes = []
 
     if (this.get('hide.ad')) classes.push('ks-hide-ad')
@@ -136,17 +132,19 @@ const config = new Storage('config', {
     if (this.get('hide.title')) classes.push('ks-hide-title')
     if (this.get('hide.titlebar')) classes.push('ks-hide-titlebar')
 
-    if (this.get('hide.right.all')) {
-      classes.push('ks-hide-right')
-    } else {
-      if (this.get('hide.right.login')) classes.push('ks-hide-right-login')
-      if (this.get('hide.right.recommend')) classes.push('ks-hide-right-recommend')
-      if (this.get('hide.right.issuezoom')) classes.push('ks-hide-right-issuezoom')
-      if (this.get('hide.right.news')) classes.push('ks-hide-right-news')
-      if (this.get('hide.right.realtime')) classes.push('ks-hide-right-realtime')
-      if (this.get('hide.right.hit')) classes.push('ks-hide-right-hit')
-      if (this.get('hide.right.sec_recommend')) classes.push('ks-hide-right-sec-recommend')
-      if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
+    if (location.href.startsWith('https://gall.dcinside.com/')) {
+      if (this.get('hide.right.all')) {
+        classes.push('ks-hide-right')
+      } else {
+        if (this.get('hide.right.login')) classes.push('ks-hide-right-login')
+        if (this.get('hide.right.recommend')) classes.push('ks-hide-right-recommend')
+        if (this.get('hide.right.issuezoom')) classes.push('ks-hide-right-issuezoom')
+        if (this.get('hide.right.news')) classes.push('ks-hide-right-news')
+        if (this.get('hide.right.realtime')) classes.push('ks-hide-right-realtime')
+        if (this.get('hide.right.hit')) classes.push('ks-hide-right-hit')
+        if (this.get('hide.right.sec_recommend')) classes.push('ks-hide-right-sec-recommend')
+        if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
+      }
     }
 
     timer()

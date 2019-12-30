@@ -32,7 +32,7 @@ const template =  /* less */`
   }
 
   body {
-    /* 시발 광고 */
+    /* 광고 */
     &.ks-hide-ad {
       .wrap_inner {
         #ad-layer,
