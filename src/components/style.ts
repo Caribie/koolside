@@ -127,33 +127,31 @@ const template =  /* less */`
     }
   }
 
-  #ks-nav {
-    width: 100%;
-    list-style-type: none;
-    background: @color-primary;
+  #ks-contextmenu {
+    transition: transform .2s;
+    transform: scale(0);
+    z-index: 1000;
+    visibility: hidden;
+    overflow: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 150px;
+    max-height: 300px;
+    border-radius: 5px;
+    background: @color-primary-dark;
     color: white;
 
-    > ul {
-      margin: 0 auto;
-      display: block;
-      max-width: 1100px;
-    }
-  
-    .ks-nav-item {
-      transition: background .25s;
-      display: inline-block;
-      padding: 1em 2em;
+    li {
+      padding: 1em;
       cursor: pointer;
     }
-    .ks-nav-item:hover {
-      background: rgba(0, 0, 0, .25)
-    }
 
-    &.ks-nav-fixed {
-      z-index: 500;
-      position: fixed;
-      top: 0;
-      left: 0;
+    &.ks-active {
+      visibility: visible;
+      transform: scale(1);
+      transform-origin: top left;
     }
   }
 

@@ -1,7 +1,7 @@
 import { tryAndWaitForTheElement } from 'wait-for-the-element'
 
 import componentConfig from './components/config'
-import componentNav from './components/nav'
+import componentContext from './components/context'
 import componentPreview from './components/preview'
 import componentStyle from './components/style'
 import cache from './includes/cache'
@@ -18,50 +18,49 @@ async function main () {
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentConfig.create()
-  componentNav.create()
+  componentContext.create()
   componentPreview.create()
 
   // 마우스 이벤트 추가하기
   const body = document.body
   const preview = document.querySelector<HTMLElement>('#ks-preview')
 
-  document.addEventListener('mousemove', e => {
-    let target = e.target as HTMLElement
+  function onMouseEvent (e: MouseEvent) {
+    const target = e.target as HTMLElement
 
-    // 게시글 목록 요소인지 확인하기
-    while (target !== null) {
-      // 프리뷰 객체라면 프리뷰 박스 내에서 스크롤 해야하므로 무시하기
-      if (target === preview) {
-        body.classList.add('ks-prevent-scrolling')
-        break
-      } else {
-        body.classList.remove('ks-prevent-scrolling')
-      }
-
-      if (target.classList && target.classList.contains('us-post')) {
-        break
-      }
-
-      target = target.parentNode as HTMLElement
+    // 컨텍스 메뉴 열린 상태라면 미리보기 끄기
+    if (document.querySelector('#ks-contextmenu.ks-active')) {
+      preview.classList.remove('ks-active')
+      return
     }
 
-    if (target) {
-      const currentPost = parseInt(preview.dataset.no, 10)
-      const post = parseInt(target.dataset.no, 10)
+    // 커서가 미리보기 객체 위에 있다면 미리보기 박스 내에서 스크롤 해야하므로 무시하기
+    if (target.closest('#ks-preview')) {
+      body.classList.add('ks-prevent-scrolling')
+      return
+    } else {
+      body.classList.remove('ks-prevent-scrolling')
+    }
+    
+    const post = target.closest<HTMLElement>('.us-post')
 
-      // 현재 프리뷰가 선택한 게시글이 아니라면 업데이트하기
-      if (currentPost !== post && cache.has(gallery, post)) {
+    if (post) {
+      const current = parseInt(preview.dataset.no, 10)
+      const number = parseInt(post.dataset.no, 10)
 
-        // 프리뷰 표시될 크기와 위치 구하기
+      // 현재 미리보기로 선택한 게시글이 아니고 캐시가 있다면 업데이트하기
+      if (current !== number && cache.has(gallery, number)) {
+
+        // 미리보기 표시될 위치 구하기
         const scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
         const clientTop = document.body.clientTop || document.documentElement.clientTop || 0
-        const rect = target.getBoundingClientRect()
+        const rect = post.getBoundingClientRect()
         const top = rect.top + scrollTop - clientTop
 
         preview.style.top = `${top}px`
         preview.style.left = `${e.pageX + 25}px`
-        preview.dataset.no = target.dataset.no
-        preview.innerHTML = cache.get(gallery, post) as string
+        preview.dataset.no = post.dataset.no
+        preview.innerHTML = cache.get(gallery, number) as string
         preview.classList.add('ks-active')
 
         for (let img of preview.querySelectorAll('img')) {
@@ -76,7 +75,10 @@ async function main () {
       preview.innerHTML = ''
       delete preview.dataset.no
     }
-  })
+  }
+
+  document.addEventListener('mousemove', onMouseEvent)
+  document.addEventListener('contextmenu', onMouseEvent)
 
   await fetchList(gallery, document.body.outerHTML)
   
