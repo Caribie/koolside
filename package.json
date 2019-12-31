@@ -1,6 +1,6 @@
 {
   "name": "koolside",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "디시인사이드 도우미",
   "scripts": {
     "lint": "eslint --fix src/**/*",
@@ -48,7 +48,6 @@
     "p-retry": "^4.2.0",
     "query-string": "^6.9.0",
     "sass.js": "^0.11.1",
-    "string-format": "^2.0.0",
-    "wait-for-the-element": "^2.2.0"
+    "string-format": "^2.0.0"
   }
 }

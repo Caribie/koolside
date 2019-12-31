@@ -26,6 +26,10 @@ export function range (value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
+export function delay (time: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, time))
+}
+
 export async function deletePosts (posts: number[] | string[]) {
   const data = {
     id: getParameter('id'),

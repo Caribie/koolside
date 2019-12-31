@@ -1,7 +1,6 @@
 import dotProp from 'dot-prop'
 
 import Storage from './storage'
-import timer from './timer'
 
 export const set: ConfigSet = {}
 
@@ -12,11 +11,8 @@ set.live = {
     interval: {
       name: '새로고침 간격 (초)',
       default: 1,
-      onChange() {
-        if (document.querySelector('.gall_list')) {
-          timer()
-        }
-      }
+      min: 0.5,
+      max: 30
     },
     thread: {
       name: '스레드',
@@ -75,14 +71,14 @@ set.hide = {
         notice: {
           name: '공지 게시글',
           default: true,
-          onChange (old) {
+          onChange (value) {
             const notices = document.querySelectorAll('.icon_notice')
 
             for (let notice of notices) {
               const post = notice.closest('tr')
 
-              if (old) {
-                post.classList.remove('.ks-none')
+              if (value) {
+                post.classList.remove('ks-none')
               } else {
                 post.classList.add('ks-none')
               }

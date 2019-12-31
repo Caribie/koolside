@@ -33,7 +33,7 @@ function onMouseEvent (e: MouseEvent) {
 
   if (post) {
     const current = parseInt(preview.dataset.no, 10)
-    const number = parseInt(post.querySelector('.gall_num').textContent, 10)
+    const number = parseInt(post.dataset.no, 10)
 
     // 현재 미리보기로 선택한 게시글이 아니고 캐시가 있다면 업데이트하기
     if (current !== number && cache.has(gallery, number)) {

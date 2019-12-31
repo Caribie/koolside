@@ -35,6 +35,7 @@ interface GM_RequestInfo {
   ignorePermanentRedirect?: boolean;
   failOnRedirect?: boolean;
   redirectionLimit?: number;
+  timeout?: number;
 }
 
 /**

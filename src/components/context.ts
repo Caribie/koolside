@@ -66,15 +66,23 @@ function onContextMenu (e: MouseEvent) {
   const clipboard = navigator.clipboard
   const selectedText = window.getSelection().toString()
 
-  const post = target.closest<HTMLElement>('tr.ub-content')
-  const number = post?.querySelector('.gall_num').textContent
+  let post = target.closest<HTMLElement>('tr.ub-content')
+  let number = post?.dataset.no
+
+  // 미리보기라면 열린 게시글 사용하기
+  if (target.closest('#ks-preview')) {
+    const preview = target.closest<HTMLElement>('#ks-preview')
+
+    post = document.querySelector(`tr[data-no="${preview.dataset.no}"]`)
+    number = post?.dataset.no
+  }
 
   // 선택한 게시글 번호만 불러오기
   const checkedPosts = [] as string[]
 
-  for (let checkedPost of document.querySelectorAll('tr.ub-content.ks-checked')) {
-    const number = checkedPost.querySelector('.gall_num').textContent
-    checkedPosts.push(number)
+  for (let input of document.querySelectorAll('tr[data-no] input:checked')) {
+    const post = input.closest('tr')
+    checkedPosts.push(post.dataset.no)
   }
 
   // 주소라면
