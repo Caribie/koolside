@@ -1,7 +1,7 @@
 import format from 'string-format'
 
 import config from '../includes/config'
-import { createElement } from "../includes/utils"
+import { createElement } from '../includes/utils'
 
 const template =  /* less */`
   @font-sans: {font_family_sans};

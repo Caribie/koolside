@@ -1,4 +1,4 @@
-import { createElement, deletePosts, hasAdminPermission } from "../includes/utils"
+import { createElement, deletePosts, hasAdminPermission } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
@@ -59,7 +59,7 @@ function onContextMenu (e: MouseEvent) {
 
     if (selectedPosts.length > 0) {
       items.push({
-        name: `선택한 게시글 삭제`,
+        name: '선택한 게시글 삭제',
         onClick () {
           if (confirm(`정말로 게시글 ${selectedPosts.length}개를 삭제하시겠습니까?`)) {
             deletePosts(selectedPosts)

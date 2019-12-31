@@ -1,4 +1,4 @@
-import { createElement } from "../includes/utils"
+import { createElement } from '../includes/utils'
 
 const componentPreview: Component = {
   create () {

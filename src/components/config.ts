@@ -1,7 +1,7 @@
-import cache from "../includes/cache"
-import config, { configOption, set } from "../includes/config"
-import { createElement } from "../includes/utils"
-import componentStyle from "./style"
+import cache from '../includes/cache'
+import config, { configOption, set } from '../includes/config'
+import { createElement } from '../includes/utils'
+import componentStyle from './style'
 
 function generateItems (set: ConfigSet, keys?: string) {
   const result = [] as string[]

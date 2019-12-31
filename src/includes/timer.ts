@@ -1,6 +1,6 @@
-import config from "./config"
-import { fetchList } from "./request"
-import { getParameter, range } from "./utils"
+import config from './config'
+import { fetchList } from './request'
+import { getParameter, range } from './utils'
 
 let interval: NodeJS.Timeout
 

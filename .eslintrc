@@ -19,6 +19,7 @@
   ],
   "rules": {
     "prefer-const": 0,
+    "@typescript-eslint/quotes": ["error", "single"],
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/class-name-casing": 0,
