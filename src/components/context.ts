@@ -1,4 +1,4 @@
-import { createElement, deletePosts, hasAdminPermission } from '../includes/utils'
+import { createElement, deletePosts, hasAdminPermission, getParameter } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
@@ -53,36 +53,41 @@ function onContextMenu (e: MouseEvent) {
   context.innerHTML = ''
 
   const items = []
-  const post = target.closest<HTMLElement>('tr.ub-content')
+
+  const clipboard = navigator.clipboard
+  const selectedText = window.getSelection().toString()
+  const selectedPost = target.closest<HTMLElement>('tr.ub-content')
+
+  // 선택한 게시글 번호만 불러오기
+  const checkedPosts = [] as string[]
+
+  for (let input of document.querySelectorAll<HTMLElement>('tr.ub-content input:checked')) {
+    const element = input.closest('tr').querySelector('.gall_num')
+    checkedPosts.push(element.textContent)
+  }
 
   // 관리 권한이 있을 때 추가될 메뉴
   if (hasAdminPermission()) {
-    if (post && !post.classList.contains('ks-deleted')) {
+    if (!selectedPost?.classList.contains('ks-deleted')) {
       items.push({
         name: '이 게시글 삭제',
         onClick () {
           if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-            deletePosts([ post.querySelector('.gall_num').textContent ])
+            deletePosts([
+              selectedPost.querySelector('.gall_num').textContent 
+            ])
           }
         }
       })
     }
 
-    // 선택한 게시글 번호만 불러오기
-    const selectedPosts = [] as string[]
-
-    for (let post of document.querySelectorAll<HTMLElement>('tr.ub-content')) {
-      if (post.querySelector('[name="chk_article[]"]:checked')) {
-        selectedPosts.push(post.querySelector('.gall_num').textContent)
-      }
-    }
-
-    if (selectedPosts.length > 0) {
+    // 체크박스 선택한 게시글이 1개 이상이라면
+    if (checkedPosts.length > 0) {
       items.push({
         name: '선택한 게시글 삭제',
         onClick () {
-          if (confirm(`정말로 게시글 ${selectedPosts.length}개를 삭제하시겠습니까?`)) {
-            deletePosts(selectedPosts)
+          if (confirm(`정말로 게시글 ${checkedPosts.length}개를 삭제하시겠습니까?`)) {
+            deletePosts(checkedPosts)
           }
         }
       })
@@ -92,12 +97,11 @@ function onContextMenu (e: MouseEvent) {
   }
 
   // 선택한 텍스트가 존재한다면
-  const selected = window.getSelection().toString()
-  if (selected) {
+  if (selectedText) {
     items.push({
       name: '복사',
       onClick () {
-        navigator.clipboard.writeText(selected)
+        clipboard.writeText(selectedText)
       }
     })
   }
@@ -114,7 +118,29 @@ function onContextMenu (e: MouseEvent) {
     })
   }
 
+  if (selectedPost) {
+    items.push({
+      name: '게시글 주소 복사',
+      onClick () {
+        const gallery = getParameter('id')
+        const number = selectedPost.querySelector('.gall_num').textContent
+        clipboard.writeText(`https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`)
+      }
+    })
+
+    items.push({
+      name: '작성자 정보 복사',
+      onClick () {
+        const writer = selectedPost.querySelector<HTMLElement>('.gall_writer')
+        const nickname = writer.dataset.nick
+        const unique = writer.dataset.uid || writer.dataset.ip
+        clipboard.writeText(`${nickname} (${unique})`)
+      }
+    })
+  }
+
   // 가장 마지막에 설정 메뉴 추가하기
+  items.push({})
   items.push({
     name: '유저스크립트 설정',
     onClick () {
@@ -129,7 +155,7 @@ function onContextMenu (e: MouseEvent) {
       e.innerText = item.name
       e.addEventListener('click', item.onClick)
       context.append(e)
-    } else {
+    } else if (!context.lastElementChild.classList.contains('ks-splitter')) {
       e.classList.add('ks-splitter')
     }
 
