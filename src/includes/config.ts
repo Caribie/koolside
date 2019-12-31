@@ -13,7 +13,9 @@ set.live = {
       name: '새로고침 간격 (초)',
       default: 1,
       onChange() {
-        timer()
+        if (document.querySelector('.gall_list')) {
+          timer()
+        }
       }
     },
     thread: {
@@ -203,7 +205,7 @@ const config = new Storage('config', {
     if (location.href.startsWith('https://gall.dcinside.com/')) {
       if (this.get('hide.gallery.title')) classes.push('ks-hide-title')
       if (this.get('hide.gallery.titlebar')) classes.push('ks-hide-titlebar')
-      if (this.get('hide.gallery.notice')) classes.push('ks-hide-notice')
+      if (this.get('hide.gallery.history')) classes.push('ks-hide-history')
 
       if (this.get('hide.right.all')) {
         classes.push('ks-hide-right')
