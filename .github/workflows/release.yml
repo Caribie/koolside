@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    paths:
+    - '.github'
+    - '**.ts'
+    - '**.json'
+    tags:
+    - 'v*'
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+ 
+    - name: Setup
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+
+    - name: Initialization
+      run: npm install
+
+    - name: Linting
+      uses: reviewdog/action-eslint@v1
+      with:
+        github_token: ${{ secrets.github_token }}
+        eslint_flags: 'src/**/*.ts'
+        reporter: github-pr-review
+
+    - name: Build
+      run: npm run build
+      env:
+        CI: true
+
+    - name: Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
