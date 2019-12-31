@@ -55,4 +55,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./dist/koolside.user.js
         asset_name: koolside.user.js
-        asset_content_type: text/javascript
+        asset_content_type: application/javascript
