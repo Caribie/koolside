@@ -1,5 +1,5 @@
-import { createElement, getParameter } from '../includes/utils'
 import cache from '../includes/cache'
+import { createElement, getParameter } from '../includes/utils'
 
 function onMouseEvent (e: MouseEvent) {
   const target = e.target as HTMLElement

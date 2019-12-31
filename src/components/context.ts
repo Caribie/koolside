@@ -1,4 +1,4 @@
-import { createElement, deletePosts, hasAdminPermission, getParameter } from '../includes/utils'
+import { createElement, deletePosts, getParameter,hasAdminPermission } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
@@ -8,7 +8,7 @@ function onClick (e: MouseEvent) {
   }
 }
 
-function onSelectionChange (e: MouseEvent) {
+function onSelectionChange () {
   const selection = window.getSelection()
 
   // 드래그로 게시글 선택하기
@@ -70,7 +70,66 @@ function onContextMenu (e: MouseEvent) {
     checkedPosts.push(number)
   }
 
-  // 관리 권한이 있을 때 추가될 메뉴
+  // 게시글이 존재한다면
+  if (selectedPost) {
+    const gallery = getParameter('id')
+    const number = selectedPost.querySelector('.gall_num').textContent
+    const url = `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
+
+    const writer = selectedPost.querySelector<HTMLElement>('.gall_writer')
+    const author = writer.dataset.nick
+    const authorId = writer.dataset.uid || writer.dataset.ip
+
+    items.push({
+      name: '새 탭에서 열기',
+      url
+    })
+
+    items.push({
+      name: '게시글 주소 복사',
+      onClick () {
+        clipboard.writeText(url)
+      }
+    })
+
+    items.push({
+      name: '작성자 정보 복사',
+      onClick () {
+        clipboard.writeText(`${author} (${authorId})`)
+      }
+    })
+
+    if (writer.dataset.uid) {
+      items.push({
+        name: '작성자 갤로그',
+        url: `https://gallog.dcinside.com/${authorId}`
+      })
+    }
+  }
+
+  // 선택한 텍스트가 존재한다면
+  if (selectedText) {
+    items.push({
+      name: '복사',
+      onClick () {
+        clipboard.writeText(selectedText)
+      }
+    })
+  }
+
+  // 붙여 넣을 수 있는 객체 위에서 열었다면
+  if (target.matches('input, textarea')) {
+    items.push({
+      name: '붙여넣기',
+      onClick () {
+        navigator.clipboard.readText().then(text => {
+          (target as HTMLInputElement | HTMLTextAreaElement).value = text
+        })
+      }
+    })
+  }
+
+  // 관리 권한이 있다면
   if (hasAdminPermission()) {
     if (selectedPost?.matches(':not(.ks-deleted)')) {
       items.push({
@@ -101,50 +160,6 @@ function onContextMenu (e: MouseEvent) {
     items.push({})
   }
 
-  // 선택한 텍스트가 존재한다면
-  if (selectedText) {
-    items.push({
-      name: '복사',
-      onClick () {
-        clipboard.writeText(selectedText)
-      }
-    })
-  }
-
-  // 붙여 넣을 수 있는 객체 위에서 열었다면
-  if (target.matches('input, textarea')) {
-    items.push({
-      name: '붙여넣기',
-      onClick () {
-        navigator.clipboard.readText().then(text => {
-          (target as HTMLInputElement | HTMLTextAreaElement).value = text
-        })
-      }
-    })
-  }
-
-  // 게시글이 존재한다면
-  if (selectedPost) {
-    items.push({
-      name: '게시글 주소 복사',
-      onClick () {
-        const gallery = getParameter('id')
-        const number = selectedPost.querySelector('.gall_num').textContent
-        clipboard.writeText(`https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`)
-      }
-    })
-
-    items.push({
-      name: '작성자 정보 복사',
-      onClick () {
-        const writer = selectedPost.querySelector<HTMLElement>('.gall_writer')
-        const nickname = writer.dataset.nick
-        const unique = writer.dataset.uid || writer.dataset.ip
-        clipboard.writeText(`${nickname} (${unique})`)
-      }
-    })
-  }
-
   // 가장 마지막에 설정 메뉴 추가하기
   items.push({})
   items.push({
@@ -157,8 +172,10 @@ function onContextMenu (e: MouseEvent) {
   for (let item of items) {
     const li = document.createElement('li')
 
-    if (item.name) {
-      li.innerText = item.name
+    if (item.url) {
+      li.innerHTML = `<a href="${item.url}" target="_blank">${item.name}</a>`
+    } else if (item.name) {
+      li.innerHTML = `<a>${item.name}</a>`
       li.addEventListener('click', item.onClick)
     } else if (!context.lastElementChild?.classList.contains('ks-splitter')) {
       li.classList.add('ks-splitter')

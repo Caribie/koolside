@@ -142,12 +142,17 @@ const template =  /* less */`
     max-height: 300px;
     border-radius: 5px;
     background: @color-primary;
-    color: white;
 
     li {
       transition: background-color .25s;
-      padding: .5em 1em;
       cursor: pointer;
+
+      a {
+        display: inline-block;
+        padding: .5em 1em;
+        text-decoration: none;
+        color: white;
+      }
 
       &.ks-splitter {
         border-top: 1px solid @color-primary-darker;
@@ -238,6 +243,7 @@ const template =  /* less */`
 
   #ks-preview {
     transition: opacity .25s;
+    transform-origin: top left; 
     z-index: 1000;
     position: absolute;
     top: 0;
@@ -269,7 +275,10 @@ const template =  /* less */`
 
     &.ks-active {
       visibility: visible;
-      opacity: .85;
+      opacity: .5;
+    }
+    &.ks-active:hover {
+      opacity: 1;
     }
   }
 
