@@ -1,7 +1,7 @@
 # koolside
 
 <p align="center">
-  <a href="https://derpy.kr/koolside/download.php"><img src="docs/logo.png" alt="KOOLSIDE"></a>
+  <a href="https://greasyfork.org/ko/scripts/394469-koolside" target="_blank"><img src="docs/logo.png" alt="KOOLSIDE"></a>
   <img alt="GitHub" src="https://img.shields.io/github/license/toriato/koolside?label=%EB%9D%BC%EC%9D%B4%EC%84%A0%EC%8A%A4&style=flat-square">
   <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/toriato/koolside/Release?label=%EB%B9%8C%EB%93%9C&style=flat-square">
   <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/toriato/koolside?label=%EB%A6%B4%EB%A6%AC%EC%A6%88&style=flat-square">
@@ -19,7 +19,7 @@
 - [Chrome, Opera](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 
 ### 유저스크립트
-위에 큰 로고 또는 옆에 [설치하기](https://derpy.kr/koolside/download.php) 주소를 클릭하면 설치 화면이 나옵니다.
+위에 큰 로고 또는 옆에 [설치하기](https://greasyfork.org/ko/scripts/394469-koolside) 주소를 클릭하면 설치 화면이 나옵니다.
 
 ## 개발하기
 ```

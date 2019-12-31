@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
   // @namespace     https://github.com/toriato/koolside
   // @supportURL    https://github.com/toriato/koolside/issues
   // @homepageURL   https://github.com/toriato/koolside
-  // @downloadURL   https://derpy.kr/koolside/download.php
+  // @downloadURL   https://github.com/toriato/koolside/releases/latest/download/koolside.user.js"
   // @version       ${package.version}
   // @author        ${package.author}
   // @description   ${package.description}
