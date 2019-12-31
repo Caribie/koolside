@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     paths:
-    - '.github'
+    - '.github/**'
     - '**.ts'
     - '**.json'
     tags:
@@ -38,9 +38,21 @@ jobs:
         CI: true
 
     - name: Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/koolside.user.js
+        asset_name: koolside.user.js
+        asset_content_type: text/javascript

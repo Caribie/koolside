@@ -8,13 +8,13 @@ module.exports = (env, argv) => {
 
   const mode = sans ? 'development' : 'production'
   const devtool = sans ? 'cheap-module-eval-source-map' : ''
-  const filename = sans ? 'debug.user.js' : 'lib.user.js'
+  const filename = sans ? 'debug.user.js' : 'koolside.user.js'
 
   const metadata = stripIndent`
   // ==UserScript==
   // @name          koolside
   // @namespace     https://github.com/toriato/koolside
-  // @downloadURL   https://github.com/toriato/koolside/raw/master/dist/lib.user.js
+  // @downloadURL   https://github.com/toriato/koolside/releases/latest/download/koolside.user.js
   // @supportURL    https://github.com/toriato/koolside/issues
   // @homepageURL   https://github.com/toriato/koolside
   // @version       ${package.version}
