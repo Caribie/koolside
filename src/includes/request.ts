@@ -100,7 +100,7 @@ export async function fetchPost (gallery: string, post: number) {
   cache.set(gallery, post, content)
 
   // 미리보기 대기 중 클래스 삭제하기
-  document.querySelector('tr.us-post.ks-loading')?.classList.remove('ks-loading')
+  document.querySelector('tr.ub-content.ks-loading')?.classList.remove('ks-loading')
 
   return content
 }
@@ -145,7 +145,7 @@ export async function fetchList (gallery: string, html?: string) {
   }
 
   const $ = createElement(matches.groups.body).parentNode
-  const posts = $.querySelectorAll('.us-post') as NodeListOf<HTMLElement>
+  const posts = $.querySelectorAll('.ub-content') as NodeListOf<HTMLElement>
   const tbody = document.querySelector('.gall_list tbody')
 
   const numbers = []
