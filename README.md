@@ -1,7 +1,7 @@
 # koolside
 
 <p align="center">
-  <a href="https://github.com/toriato/koolside/raw/master/dist/lib.user.js"><img src="docs/logo.png" alt="KOOLSIDE"></a>
+  <a href="https://derpy.kr/koolside/koolside.user.js"><img src="docs/logo.png" alt="KOOLSIDE"></a>
   <a href="https://github.com/toriato/koolside/actions?query=workflow%3A%22Node+CI%22">
     <img src="https://github.com/toriato/koolside/workflows/Node%20CI/badge.svg" alt="Node CI">
   </a>
@@ -19,7 +19,7 @@
 - [Chrome, Opera](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 
 ### 유저스크립트
-위에 큰 로고 또는 옆에 [설치하기](https://github.com/toriato/koolside/raw/master/dist/lib.user.js) 주소를 클릭하면 설치 화면이 나옵니다.
+위에 큰 로고 또는 옆에 [설치하기](https://derpy.kr/koolside/koolside.user.js) 주소를 클릭하면 설치 화면이 나옵니다.
 
 ## 자주 묻는 질문
 
