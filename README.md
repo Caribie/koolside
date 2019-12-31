@@ -2,9 +2,9 @@
 
 <p align="center">
   <a href="https://derpy.kr/koolside/koolside.user.js"><img src="docs/logo.png" alt="KOOLSIDE"></a>
-  <a href="https://github.com/toriato/koolside/actions?query=workflow%3A%22Node+CI%22">
-    <img src="https://github.com/toriato/koolside/workflows/Node%20CI/badge.svg" alt="Node CI">
-  </a>
+  <img alt="GitHub" src="https://img.shields.io/github/license/toriato/koolside?label=%EB%9D%BC%EC%9D%B4%EC%84%A0%EC%8A%A4&style=flat-square">
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/toriato/koolside/Release?label=%EB%B9%8C%EB%93%9C&style=flat-square">
+  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/toriato/koolside?label=%EB%A6%B4%EB%A6%AC%EC%A6%88&style=flat-square">
 <p>
 
 ## 주의
