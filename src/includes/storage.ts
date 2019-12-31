@@ -33,7 +33,8 @@ export default class Storage {
   }
 
   get<T = Storable> (key: string) {
-    return dotProp.get<T>(this.storage, key) || dotProp.get<T>(this.opts.defaultValue, key)
+    const value = dotProp.get<T>(this.storage, key)
+    return value === null ? dotProp.get<T>(this.opts.defaultValue, key) : value
   }
 
   set (key: string, value: Storable) {

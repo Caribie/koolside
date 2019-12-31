@@ -19,6 +19,9 @@ const template =  /* less */`
       content: '';
     }
   }
+  .ks-none {
+    display: none;
+  }
 
   html, body {
     width: 100%;
@@ -37,7 +40,7 @@ const template =  /* less */`
       #ad-layer,
       #zzbang_ad,
       .rightbanner,
-      .ub-content.dory {
+      tr.ub-content.dory {
         display: none;
       }
     }
@@ -60,11 +63,6 @@ const template =  /* less */`
     }
     &.ks-hide-history {
       .visit_history {
-        display: none;
-      }
-    }
-    &.ks-hide-notice {
-      [data-type=icon_notice] {
         display: none;
       }
     }
@@ -140,12 +138,23 @@ const template =  /* less */`
     width: 150px;
     max-height: 300px;
     border-radius: 5px;
-    background: @color-primary-dark;
+    background: @color-primary;
     color: white;
 
     li {
-      padding: 1em;
+      transition: background .25s;
+      padding: .5em 1em;
       cursor: pointer;
+
+      &.ks-splitter {
+        border-top: 1px solid @color-primary-darker;
+        padding: 0;
+        cursor: initial;
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, .5);
+      }
     }
 
     &.ks-active {
@@ -261,7 +270,7 @@ const template =  /* less */`
     }
   }
 
-  .us-post {
+  tr.ub-content {
     transition: opacity .25s;
 
     &.ks-new {

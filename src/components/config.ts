@@ -61,6 +61,11 @@ function generateItems (set: ConfigSet, keys?: string) {
         console.error(`'${key}' 설정을 처리할 수 없습니다`)
       }
 
+      // 변경 시 실행될 값이 있다면 초기화를 위해 실행하기
+      if (item.onChange) {
+        item.onChange(null, config.get(key))
+      }
+
       result.push(/* html */`
         <div class="ks-config-item ks-config-key">
           ${html}
@@ -99,6 +104,7 @@ const componentConfig: Component = {
 
       if (oldValue !== newValue) {
         // 변경시 실행할 함수가 있다면 실행하기
+        console.log(`${key}: ${oldValue} -> ${newValue}`)
         const onChange = configOption<Function>(key, 'onChange')
         if (onChange) {
           onChange(oldValue, newValue)

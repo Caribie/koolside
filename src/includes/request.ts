@@ -100,7 +100,7 @@ export async function fetchPost (gallery: string, post: number) {
   cache.set(gallery, post, content)
 
   // 미리보기 대기 중 클래스 삭제하기
-  document.querySelector('.us-post.ks-loading')?.classList.remove('ks-loading')
+  document.querySelector('tr.us-post.ks-loading')?.classList.remove('ks-loading')
 
   return content
 }
@@ -153,11 +153,11 @@ export async function fetchList (gallery: string, html?: string) {
 
   for (let post of posts) {
     // 공지 글은 무시하기
-    if (post.dataset.type === 'icon_notice') {
+    if (post.querySelector('.icon_notice')) {
       continue
     }
 
-    const number = parseInt(post.dataset.no, 10)
+    const number = parseInt(post.querySelector('.gall_num').textContent, 10)
     const cached = cache.has(gallery, number)
 
     const old = tbody.querySelector(`[data-no="${number}"]`)
@@ -170,7 +170,9 @@ export async function fetchList (gallery: string, html?: string) {
     if (old) {
       // 제목이나 댓글, 조회 수 등이 변경됐다면 내용 교체하기
       for (let td of post.querySelectorAll('td')) {
-        old.querySelector(`[class="${td.className}"]`).innerHTML = td.innerHTML
+        // 값이 변경될 때만 교체하기
+        const item = old.querySelector(`[class="${td.className}"]`)
+        if (item.innerHTML !== td.innerHTML) item.innerHTML = td.innerHTML
       }
     } else if (!cached) {
       post.classList.add('ks-new')
@@ -189,7 +191,7 @@ export async function fetchList (gallery: string, html?: string) {
   let count = 0
 
   for (let post of tbody.querySelectorAll('tr') as NodeListOf<HTMLElement>) {
-    const no = parseInt(post.dataset.no, 10)
+    const no = parseInt(post.querySelector('.gall_num').textContent, 10)
 
     // 방금 가져온 글 목록의 마지막 글 번호보다 적으면 확인할 수 없으므로 끝내기
     if (count++ >= posts.length) {
