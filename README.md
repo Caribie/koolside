@@ -21,6 +21,14 @@
 ### 유저스크립트
 위에 큰 로고 또는 옆에 [설치하기](https://derpy.kr/koolside/koolside.user.js) 주소를 클릭하면 설치 화면이 나옵니다.
 
+## 개발하기
+```
+$ git clone https://github.com/toriato/koolside.git
+$ cd koolside
+$ npm install
+$ npm run watch
+```
+
 ## 자주 묻는 질문
 
 ### 오른쪽 버튼을 눌렀을 때 메뉴가 안나와요
