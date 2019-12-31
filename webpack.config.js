@@ -20,6 +20,7 @@ module.exports = (env, argv) => {
   // @version       ${package.version}
   // @author        ${package.author}
   // @description   ${package.description}
+  // @license       MIT; https://github.com/toriato/koolside/blob/master/LICENSE
   // @include       https://*.dcinside.com/*
   // @require       https://cdnjs.cloudflare.com/ajax/libs/less.js/3.10.3/less.min.js
   // @grant         GM_getValue
