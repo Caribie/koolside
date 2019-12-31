@@ -4,15 +4,22 @@ import cache from '../includes/cache'
 function onMouseEvent (e: MouseEvent) {
   const target = e.target as HTMLElement
 
-  // 컨텍스 메뉴 열린 상태라면 미리보기 끄기
-  // if (document.querySelector('#ks-contextmenu.ks-active')) {
-  //   preview.classList.remove('ks-active')
-  //   return
-  // }
-
   const gallery = getParameter('id')
   const body = document.body
+
   const preview = document.querySelector<HTMLElement>('#ks-preview')
+  const context = document.querySelector('#ks-contextmenu')
+
+  // 텍스트 선택 중일 때는 미리보기 업데이트 안하기
+  const selecting = e.buttons & 1 && window.getSelection().toString()
+
+  if (selecting || context.matches('.ks-active')) {
+    // 미리보기 외부에서 선택했다면 미리보기 닫기
+    if (![preview, context].includes(target) && !target.closest('#ks-preview, #ks-contextmenu')) {
+      preview.classList.remove('ks-active')
+    }
+    return
+  }
 
   // 커서가 미리보기 객체 위에 있다면 미리보기 박스 내에서 스크롤 해야하므로 무시하기
   if (target.closest('#ks-preview')) {
@@ -23,15 +30,6 @@ function onMouseEvent (e: MouseEvent) {
   }
 
   const post = target.closest<HTMLElement>('tr.ub-content')
-
-  // 텍스트 선택 중일 때는 미리보기 보이지 않기
-  if (e.buttons & 1 && window.getSelection().toString()) {
-    // 미리보기 외부에서 선택했다면 미리보기 닫기
-    if (target !== preview) {
-      preview.classList.remove('ks-active')
-    }
-    return
-  }
 
   if (post) {
     const current = parseInt(preview.dataset.no, 10)
@@ -48,7 +46,7 @@ function onMouseEvent (e: MouseEvent) {
 
       preview.style.top = `${top}px`
       preview.style.left = `${e.pageX + 25}px`
-      preview.dataset.no = `${current}`
+      preview.dataset.no = `${number}`
       preview.innerHTML = cache.get(gallery, number) as string
       preview.classList.add('ks-active')
 
@@ -70,7 +68,6 @@ const componentPreview: Component = {
   create () {
     // 게시판 없다면 무시하기
     if (!document.querySelector('.gall_list')) {
-      console.log('There is no table')
       return
     }
 

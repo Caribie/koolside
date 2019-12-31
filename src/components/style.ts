@@ -9,8 +9,11 @@ const template =  /* less */`
   @font-monospace: {font_family_monospace};
 
   @color-primary: #4A56A8;
+  @color-primary-light: #6373e0;
   @color-primary-dark: #23284f;
   @color-primary-darker: #171a33;
+
+  @color-crit: #f06464;
 
   .ks-clearfix {
     &:after {
@@ -142,7 +145,7 @@ const template =  /* less */`
     color: white;
 
     li {
-      transition: background .25s;
+      transition: background-color .25s;
       padding: .5em 1em;
       cursor: pointer;
 
@@ -271,14 +274,17 @@ const template =  /* less */`
   }
 
   tr.ub-content {
-    transition: opacity .25s;
+    transition: background-color .25s, opacity .25s;
 
     &.ks-new {
       animation-name: ks-new;
       animation-duration: .5s;
     }
+    &.ks-checked {
+      background: @color-primary-light;
+    }
     &.ks-deleted {
-      background: rgb(240, 100, 100)
+      background: @color-crit;
     }
     &.ks-loading {
       opacity: .5;

@@ -11,15 +11,19 @@ function onClick (e: MouseEvent) {
 function onSelectionChange (e: MouseEvent) {
   const selection = window.getSelection()
 
-  // 관리 권한이 있다면 드래그로 게시글 선택하기
-  if (hasAdminPermission()) {
-    const items = document.querySelectorAll('tr.ub-content td')
+  // 드래그로 게시글 선택하기
+  const items = document.querySelectorAll('tr.ub-content td')
 
-    for (let item of items) {
-      const checkbox = item.closest('tr')?.querySelector('input')
-      const selected = selection.containsNode(item)
-  
-      if (checkbox) checkbox.checked = selected
+  for (let item of items) {
+    const post = item.closest('tr')
+    const checkbox = post.querySelector('input')
+    const checked = selection.containsNode(item)
+
+    if (checkbox) checkbox.checked = checked
+    if (checked) {
+      post.classList.add('ks-checked')
+    } else {
+      post.classList.remove('ks-checked')
     }
   }
 }
@@ -61,14 +65,14 @@ function onContextMenu (e: MouseEvent) {
   // 선택한 게시글 번호만 불러오기
   const checkedPosts = [] as string[]
 
-  for (let input of document.querySelectorAll<HTMLElement>('tr.ub-content input:checked')) {
-    const element = input.closest('tr').querySelector('.gall_num')
-    checkedPosts.push(element.textContent)
+  for (let checkedPost of document.querySelectorAll('tr.ub-content.ks-checked')) {
+    const number = checkedPost.querySelector('.gall_num').textContent
+    checkedPosts.push(number)
   }
 
   // 관리 권한이 있을 때 추가될 메뉴
   if (hasAdminPermission()) {
-    if (!selectedPost?.classList.contains('ks-deleted')) {
+    if (selectedPost?.matches(':not(.ks-deleted)')) {
       items.push({
         name: '이 게시글 삭제',
         onClick () {
@@ -93,6 +97,7 @@ function onContextMenu (e: MouseEvent) {
       })
     }
 
+    // 스플리터 추가하기
     items.push({})
   }
 
@@ -118,6 +123,7 @@ function onContextMenu (e: MouseEvent) {
     })
   }
 
+  // 게시글이 존재한다면
   if (selectedPost) {
     items.push({
       name: '게시글 주소 복사',
@@ -142,24 +148,25 @@ function onContextMenu (e: MouseEvent) {
   // 가장 마지막에 설정 메뉴 추가하기
   items.push({})
   items.push({
-    name: '유저스크립트 설정',
+    name: '설정',
     onClick () {
       document.querySelector('#ks-config').classList.add('ks-active')
     }
   })
 
   for (let item of items) {
-    const e = document.createElement('li')
+    const li = document.createElement('li')
 
     if (item.name) {
-      e.innerText = item.name
-      e.addEventListener('click', item.onClick)
-      context.append(e)
-    } else if (!context.lastElementChild.classList.contains('ks-splitter')) {
-      e.classList.add('ks-splitter')
+      li.innerText = item.name
+      li.addEventListener('click', item.onClick)
+    } else if (!context.lastElementChild?.classList.contains('ks-splitter')) {
+      li.classList.add('ks-splitter')
+    } else {
+      continue
     }
 
-    context.append(e)
+    context.append(li)
   }
 
   e.preventDefault()

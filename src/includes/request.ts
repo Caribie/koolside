@@ -168,12 +168,17 @@ export async function fetchList (gallery: string, html?: string) {
     }
 
     if (old) {
-      // 제목이나 댓글, 조회 수 등이 변경됐다면 내용 교체하기
+
+      // 수정된 부분만 변경하기
       for (let td of post.querySelectorAll('td')) {
-        // 값이 변경될 때만 교체하기
-        const item = old.querySelector(`[class="${td.className}"]`)
-        if (item.innerHTML !== td.innerHTML) item.innerHTML = td.innerHTML
+        const selector = td.className.match(/(?<class>gall_\w+)/)?.groups.class
+        const oldTd = post.querySelector(`.${selector}`)
+
+        if (oldTd && oldTd.innerHTML !== td.innerHTML) {
+          oldTd.innerHTML = td.innerHTML
+        }
       }
+
     } else if (!cached) {
       post.classList.add('ks-new')
       tbody.prepend(post)
