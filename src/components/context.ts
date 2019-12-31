@@ -31,13 +31,17 @@ function onSelectionChange () {
 function onContextMenu (e: MouseEvent) {
   const target = e.target as HTMLElement
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
+  const nativeTags = ['IMG']
 
   // 설정 화면에선 무시하기
   if (target.closest('#ks-config')) {
+    context.classList.remove('ks-active')
     return
-  }
-
-  if (target.closest('#ks-contextmenu') === context) {
+  } else if (nativeTags.includes(target.tagName)) {
+    // 특정 태그에선 기본 컨텍스 메뉴만 사용하기
+    context.classList.remove('ks-active')
+    return
+  } else if (target.closest('#ks-contextmenu') === context) {
     // 컨텍스 메뉴 켜진 상태에서 한번 더 열었다면 네이티브 컨텍스 열기
     context.classList.remove('ks-active')
     return
@@ -58,9 +62,12 @@ function onContextMenu (e: MouseEvent) {
 
   const items = []
 
+  const gallery = getParameter('id')
   const clipboard = navigator.clipboard
   const selectedText = window.getSelection().toString()
-  const selectedPost = target.closest<HTMLElement>('tr.ub-content')
+
+  const post = target.closest<HTMLElement>('tr.ub-content')
+  const number = post?.querySelector('.gall_num').textContent
 
   // 선택한 게시글 번호만 불러오기
   const checkedPosts = [] as string[]
@@ -70,25 +77,30 @@ function onContextMenu (e: MouseEvent) {
     checkedPosts.push(number)
   }
 
-  // 게시글이 존재한다면
-  if (selectedPost) {
-    const gallery = getParameter('id')
-    const number = selectedPost.querySelector('.gall_num').textContent
-    const url = `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
+  // 주소라면
+  const link = target.closest('a')
 
-    const writer = selectedPost.querySelector<HTMLElement>('.gall_writer')
-    const author = writer.dataset.nick
-    const authorId = writer.dataset.uid || writer.dataset.ip
+  if (link || post) {
+    const url = link?.getAttribute('href') || `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
 
     items.push({
       name: '새 탭에서 열기',
       url
     })
 
+    items.push({})
+  }
+
+  // 게시글이 존재한다면
+  if (post) {
+    const writer = post.querySelector<HTMLElement>('.gall_writer')
+    const author = writer.dataset.nick
+    const authorId = writer.dataset.uid || writer.dataset.ip
+
     items.push({
       name: '게시글 주소 복사',
       onClick () {
-        clipboard.writeText(url)
+        clipboard.writeText(`https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`)
       }
     })
 
@@ -131,14 +143,15 @@ function onContextMenu (e: MouseEvent) {
 
   // 관리 권한이 있다면
   if (hasAdminPermission()) {
-    if (selectedPost?.matches(':not(.ks-deleted)')) {
+    // 스플리터
+    items.push({})
+
+    if (post?.matches(':not(.ks-deleted)')) {
       items.push({
         name: '이 게시글 삭제',
         onClick () {
           if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-            deletePosts([
-              selectedPost.querySelector('.gall_num').textContent 
-            ])
+            deletePosts([ number ])
           }
         }
       })
@@ -155,13 +168,15 @@ function onContextMenu (e: MouseEvent) {
         }
       })
     }
-
-    // 스플리터 추가하기
-    items.push({})
   }
 
   // 가장 마지막에 설정 메뉴 추가하기
   items.push({})
+  items.push({
+    name: '글쓰기',
+    url: `https://gall.dcinside.com/mgallery/board/write/?id=${gallery}`
+  })
+
   items.push({
     name: '설정',
     onClick () {

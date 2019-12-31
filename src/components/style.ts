@@ -60,7 +60,7 @@ const template =  /* less */`
       }
     }
     &.ks-hide-titlebar {
-      .left_content article:nth-child(2) {
+      header + article {
         display: none;
       }
     }
