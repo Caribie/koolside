@@ -4,19 +4,20 @@ import config from '../includes/config'
 import { createElement } from '../includes/utils'
 
 const template =  /* less */`
+  @animation-speed: {animation_speed}s;
+
   @font-sans: {font_family_sans};
   @font-serif: {font_family_serif};
   @font-monospace: {font_family_monospace};
 
   @color-primary: #4A56A8;
-
   @color-crit: #f06464;
 
 
   /* Functions */
   .ks-update {
       animation-name: ks-update;
-      animation-duration: .5s;
+      animation-duration: @animation-speed;
     }
   .ks-clearfix {
     &:after {
@@ -133,7 +134,7 @@ const template =  /* less */`
   }
 
   #ks-contextmenu {
-    transition: transform .2s;
+    transition: transform @animation-speed;
     transform: scale(0);
     z-index: 1000;
     visibility: hidden;
@@ -148,7 +149,7 @@ const template =  /* less */`
     background: @color-primary;
 
     li {
-      transition: background-color .25s;
+      transition: background-color @animation-speed;
       cursor: pointer;
 
       a {
@@ -177,7 +178,7 @@ const template =  /* less */`
   }
 
   #ks-config {
-    transition: opacity .25s;
+    transition: opacity @animation-speed;
     z-index: 1000;
     position: fixed;
     top: 0;
@@ -246,7 +247,7 @@ const template =  /* less */`
   }
 
   #ks-preview {
-    transition: opacity .25s;
+    transition: opacity @animation-speed;
     transform-origin: top left; 
     z-index: 1000;
     position: absolute;
@@ -254,7 +255,6 @@ const template =  /* less */`
     left: 0;
     overflow: hidden;
     overflow-y: auto;
-    transition: opacity .25s;
     visibility: hidden;
     padding: 1em;
     max-width: 500px;
@@ -287,7 +287,7 @@ const template =  /* less */`
   }
 
   tr.ub-content {
-    transition: background-color .25s, opacity .25s;
+    transition: background-color @animation-speed, opacity @animation-speed;
 
     &.ks-checked {
       background: lighten(@color-primary, 25%);

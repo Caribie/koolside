@@ -133,8 +133,14 @@ set.hide = {
 
 // 스타일시트 관련 설정
 set.style = {
-  name: '사용자 스타일',
+  name: '모양',
   set: {
+    animation_speed: {
+      name: '애니메이션 속도 (초)',
+      default: 0.25,
+      min: 0,
+      max: 2
+    },
     font_family_sans: {
       name: '산세리프 글꼴',
       default: '"맑은 고딕", sans-serif'

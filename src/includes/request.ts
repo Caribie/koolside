@@ -174,6 +174,7 @@ export async function fetchList (gallery: string) {
     const fetchedString = fetchedPost.querySelector('.gall_num').textContent
     const fetched = parseInt(fetchedString, 10)
     fetchedPost.dataset.no = fetchedString
+    fetchedPosts.push(fetched)
 
     // 기존 게시글 요소 불러오기
     const post = table.querySelector(`[data-no="${fetched}"]`)
@@ -204,8 +205,6 @@ export async function fetchList (gallery: string) {
       table.prepend(fetchedPost)
       addedPosts.push(fetched)
     }
-
-    fetchedPosts.push(fetched)
   }
 
   // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
