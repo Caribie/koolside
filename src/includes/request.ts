@@ -3,7 +3,7 @@ import pRetry from 'p-retry'
 
 import cache from './cache'
 import config from './config'
-import { createElement, delay,hasAdminPermission } from './utils'
+import { createElement, hasAdminPermission } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
 
