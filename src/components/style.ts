@@ -9,12 +9,15 @@ const template =  /* less */`
   @font-monospace: {font_family_monospace};
 
   @color-primary: #4A56A8;
-  @color-primary-light: #6373e0;
-  @color-primary-dark: #23284f;
-  @color-primary-darker: #171a33;
 
   @color-crit: #f06464;
 
+
+  /* Functions */
+  .ks-update {
+      animation-name: ks-update;
+      animation-duration: .5s;
+    }
   .ks-clearfix {
     &:after {
       display: table;
@@ -26,6 +29,7 @@ const template =  /* less */`
     display: none;
   }
 
+  /* Reset */
   html, body {
     width: 100%;
     height: 100%;
@@ -155,7 +159,7 @@ const template =  /* less */`
       }
 
       &.ks-splitter {
-        border-top: 1px solid @color-primary-darker;
+        border-top: 1px solid darken(@color-primary, 50%);
         padding: 0;
         cursor: initial;
       }
@@ -198,7 +202,7 @@ const template =  /* less */`
       min-height: 300px;
       max-height: 80%;
       border-radius: 5px;
-      background: @color-primary-dark;
+      background: darken(@color-primary, 25%);
       box-shadow: 0 0 100% black;
       color: white;
       cursor: initial;
@@ -227,7 +231,7 @@ const template =  /* less */`
         float: right;
         display: inline-block;
         border: 1px solid rgba(0, 0, 0, .15);
-        background: @color-primary-dark;
+        background: darken(@color-primary, 25%);
         font-family: @font-monospace;
         color: white;
       }
@@ -285,12 +289,8 @@ const template =  /* less */`
   tr.ub-content {
     transition: background-color .25s, opacity .25s;
 
-    &.ks-new {
-      animation-name: ks-new;
-      animation-duration: .5s;
-    }
     &.ks-checked {
-      background: @color-primary-light;
+      background: lighten(@color-primary, 25%);
     }
     &.ks-deleted {
       background: @color-crit;
@@ -300,16 +300,12 @@ const template =  /* less */`
     }
   }
 
-  @keyframes ks-new {
+  @keyframes ks-update {
     from {
-      transform: scaleY(0);
-      max-height: 0;
-      background: rgba(240, 100, 100, 1);
+      background-color: fade(@color-primary, 15%);
     }
     to {
-      transform: scaleY(1);
-      max-height: 100%;
-      background: rgba(240, 100, 100, 0);
+      background-color: 0;
     }
   }
 `

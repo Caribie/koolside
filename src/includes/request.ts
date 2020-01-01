@@ -180,7 +180,7 @@ export async function fetchList (gallery: string) {
 
     if (post) {
       // 새 글 인식표 지우기
-      post.classList.remove('ks-new')
+      post.classList.remove('ks-update')
 
       // 수정된 부분만 변경하기
       for (let fetchedTd of fetchedPost.querySelectorAll('td')) {
@@ -200,7 +200,7 @@ export async function fetchList (gallery: string) {
     
     if (!cache.has(gallery, fetched)) {
       // 아예 존재하지 않는다면 테이블에 추가하기
-      fetchedPost.classList.add('ks-new')
+      fetchedPost.classList.add('ks-update')
       table.prepend(fetchedPost)
       addedPosts.push(fetched)
     }
@@ -228,7 +228,7 @@ export async function fetchList (gallery: string) {
     }
 
     // 방금 추가된 글이거나 이미 삭제된 게시글이면 무시하기
-    if (post.matches('.ks-new, .ks-deleted')) {
+    if (post.matches('.ks-update, .ks-deleted')) {
       continue
     }
 

@@ -37,15 +37,6 @@ function onMouseEvent (e: MouseEvent) {
 
     // 현재 미리보기로 선택한 게시글이 아니고 캐시가 있다면 업데이트하기
     if (current !== number && cache.has(gallery, number)) {
-
-      // 미리보기 표시될 위치 구하기
-      const scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
-      const clientTop = document.body.clientTop || document.documentElement.clientTop || 0
-      const rect = post.getBoundingClientRect()
-      const top = rect.top + scrollTop - clientTop
-
-      preview.style.top = `${top}px`
-      preview.style.left = `${e.pageX + 25}px`
       preview.dataset.no = `${number}`
       preview.innerHTML = cache.get(gallery, number) as string
       preview.classList.add('ks-active')
@@ -55,6 +46,19 @@ function onMouseEvent (e: MouseEvent) {
           this.classList.toggle('ks-active')
         })
       }
+
+      // 미리보기 표시될 위치 구하기
+      const scrollTop = document.documentElement.scrollTop
+      const previewRect = preview.getBoundingClientRect()
+      const postRect = post.getBoundingClientRect()
+
+      const top = scrollTop + (postRect.top + postRect.height / 2) - (previewRect.height / 2)
+      const offset = 
+        Math.min(0, top - scrollTop) + // Top
+        Math.max(0, (top + previewRect.height) - (scrollTop + body.clientHeight)) // Bottom
+
+      preview.style.top = `${top - offset}px`
+      preview.style.left = `${e.pageX + 25}px`
     }
   } else {
     // 프리뷰 박스 초기화
