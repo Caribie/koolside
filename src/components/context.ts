@@ -165,13 +165,6 @@ function onContextMenu (e: MouseEvent) {
     const authorId = writer.dataset.uid || writer.dataset.ip
 
     items.push({
-      name: '게시글 주소 복사',
-      onClick () {
-        clipboard.writeText(`https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`)
-      }
-    })
-
-    items.push({
       name: '작성자 정보 복사',
       onClick () {
         clipboard.writeText(`${author} (${authorId})`)
