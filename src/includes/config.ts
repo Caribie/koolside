@@ -105,7 +105,7 @@ set.hide = {
       default: true
     },
     logo: {
-      name: '웹 사이트 로고',
+      name: '로고',
       default: false
     },
     gallery: {

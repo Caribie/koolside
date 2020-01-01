@@ -86,7 +86,7 @@ function generateItems (set: ConfigSet, keys?: string) {
         item.onChange(null, Config.get(key))
       }
 
-      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description || key}">${html}</div>`)
+      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description || item.name}">${html}</div>`)
     }
   }
 
