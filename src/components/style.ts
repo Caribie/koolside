@@ -1,5 +1,3 @@
-import format from 'string-format'
-
 import Config from '../includes/config'
 import { createElement } from '../includes/utils'
 
@@ -254,6 +252,7 @@ const template =  /* less */`
         font-family: @font-monospace;
       }
       > textarea {
+        min-height: 100px;
         resize: vertical;
 
         &::placeholder {
@@ -352,7 +351,7 @@ const template =  /* less */`
 const componentStyle: Component = {
   create () {
     const style = createElement('<style id="ks-style" type="text/less"></style>')
-    style.innerHTML = format(template, Config.get('style'))
+    style.innerHTML = template.replace(/\{([\w_]+)\}/g, (_, key) => Config.get(`style.${key}`))
     document.head.append(style)
 
     if (Config.get('debug.less')) {

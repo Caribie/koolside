@@ -1,5 +1,7 @@
 import dotProp from 'dot-prop'
 
+import { formatFont } from './utils'
+
 export const set = {} as ConfigSet
 
 // 게시판 관련 설정
@@ -197,25 +199,39 @@ set.style = {
     },
     font_family_sans: {
       name: '산세리프 글꼴',
-      default: '"나눔스퀘어", "나눔바른고딕", "나눔고딕", "맑은 고딕", sans-serif'
+      default: '나눔스퀘어\n나눔바른고딕\n나눔고딕\n맑은 고딕\nsans-serif',
+      textarea: true,
+      format: formatFont
     },
     font_family_serif: {
       name: '세리프 글꼴',
-      default: '"나눔명조", serif'
+      default: '나눔명조\nserif',
+      textarea: true,
+      format: formatFont
     },
     font_family_monospace: {
       name: '고정폭 글꼴',
-      default: '"D2Coding ligature", "D2Coding", "나눔고딕코딩", monospace'
+      default: 'D2Coding ligature\nD2Coding\n나눔고딕코딩\nmonospace',
+      textarea: true,
+      format: formatFont
     },
     font_size: {
       name: '글자 크기',
       description: '사이트 전반적인 글자의 크기입니다',
-      default: '13px'
+      default: 13,
+      step: 1,
+      min: 10,
+      max: 20,
+      format: size => `${size}px`
     },
     font_size_preview: {
       name: '미리보기 글자 크기',
       description: '미리보기 속 글자 크기입니다',
-      default: '1.5em'
+      default: 15,
+      step: 1,
+      min: 10,
+      max: 30,
+      format: size => `${size}px`
     }
   }
 }
@@ -231,10 +247,6 @@ set.debug = {
   }
 }
 
-/**
- * 
- * @param set 설정 데이터
- */
 function defaultValues (set: ConfigSet) {
   const result = {} as LooseObject
 
@@ -246,7 +258,7 @@ function defaultValues (set: ConfigSet) {
   return result
 }
 
-class Config {
+export default class Config {
   private static storage: LooseObject = {}
   private static defaultValues = defaultValues(set)
 
@@ -297,18 +309,25 @@ class Config {
    * @param key 키
    * @param opt 옵션명
    */
-  static getOpt<T = Storable> (key: string, opt: string) {
-    key = `${key.replace(/\./g, '.set.')}.${opt}`
-    return dotProp.get<T>(set, key)
+  static getOpt<T> (key: string, opt: string) {
+    return dotProp.get<T>(set, `${key.replace(/\./g, '.set.')}.${opt}`)
   }
 
   /**
-   * 설정 값을 가져옵니다
+   * 설정 기본 값을 가져옵니다
    * @param key 키
    */
-  static get<T = Storable> (key: string) {
+  static getDefaultValue<T = Storable> (key: string) {
+    return dotProp.get<T>(this.defaultValues, key)
+  }
+
+  /**
+   * 포맷 함수를 실행하지 않는 설정 값을 가져옵니다
+   * @param key 키
+   */
+  static getRaw<T = Storable> (key: string) {
     const value = dotProp.get<T>(this.storage, key)
-    const defaultValue = dotProp.get<T>(this.defaultValues, key)
+    const defaultValue = this.getDefaultValue<T>(key)
 
     // 값이 설정되지 않았다면 기본 값 반환하기
     if ([undefined, null].includes(value)) {
@@ -323,6 +342,17 @@ class Config {
     }
 
     return value
+  }
+
+  /**
+   * 설정 값을 가져옵니다
+   * @param key 키
+   */
+  static get<T = Storable> (key: string) {
+    const format = this.getOpt<Function>(key, 'format')
+    const value = this.getRaw<T>(key)
+
+    return format ? format(value) as T : value
   }
 
   /**
@@ -351,5 +381,3 @@ class Config {
     this.sync()
   }
 }
-
-export default Config

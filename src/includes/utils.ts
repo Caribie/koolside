@@ -22,12 +22,8 @@ export function hasAdminPermission () {
   return !!document.querySelector('.btn_useradmin_go')
 }
 
-export function range (value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-export function delay (time: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, time))
+export function formatFont (fonts: string) {
+  return fonts.split('\n').map(font => `"${font}"`).join(', ')
 }
 
 export async function deletePosts (posts: number[] | string[]) {
@@ -49,4 +45,12 @@ export async function deletePosts (posts: number[] | string[]) {
   const result = await res.json()
 
   return result
+}
+
+export function range (value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+export function delay (time: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, time))
 }

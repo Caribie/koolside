@@ -6,6 +6,10 @@ interface ConfigItem {
   /** 설명 */
   description?: string;
 
+  /** 값을 가져올 때 한번 거칠 함수 */
+  // eslint-disable-next-line
+  format?: (v: any) => any;
+
   /** 값 수정 됐을 때 실행할 함수 */
   // eslint-disable-next-line
   onChange?<T = any>(oldValue: T, newValue: T): void;

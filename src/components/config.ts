@@ -25,7 +25,7 @@ function generateItems (set: ConfigSet, keys?: string) {
     } else {
       // 아이템 추가하기
       const key = `${keys}${k}`
-      const value = Config.get(key)
+      const value = Config.getRaw(key)
 
       let html = ''
 
@@ -93,27 +93,30 @@ function generateItems (set: ConfigSet, keys?: string) {
 
 function update (this: HTMLInputElement) {
   const key = this.dataset.key
-  const oldValue = Config.get(key)
+  const type = typeof Config.getDefaultValue(key)
+  const oldValue = Config.getRaw(key)
 
   let newValue
 
-  if (typeof oldValue === 'boolean') {
-    newValue = this.checked
-  } else {
-    newValue = this.value
+  switch (type) {
+    case 'boolean':
+      newValue = this.checked
+      break
+    case 'number':
+      newValue = parseInt(this.value, 10)
+      break
+    default:
+      newValue = this.value
   }
 
-  if (oldValue !== newValue) {
-    // 변경시 실행할 함수가 있다면 실행하기
-    console.log(`${key}: ${oldValue} -> ${newValue}`)
-    const onChange = Config.getOpt<Function>(key, 'onChange')
-    if (onChange) {
-      onChange(oldValue, newValue)
-    }
-
-    Config.set(key, newValue)
-    Config.sync()
+  // 변경 시 실행할 함수가 있다면 전후 변수 인자에 넣어 실행하기
+  const onChange = Config.getOpt<Function>(key, 'onChange')
+  if (onChange) {
+    onChange(oldValue, newValue)
   }
+
+  Config.set(key, newValue)
+  Config.sync()
 
   // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
   if (key.startsWith('style')) {
