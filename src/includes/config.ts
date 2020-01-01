@@ -4,36 +4,41 @@ import Storage from './storage'
 
 export const set: ConfigSet = {}
 
-// 실시간 새로고침 관련 설정
+// 게시판 관련 설정
 set.live = {
-  name: '자동 새로고침',
+  name: '게시판',
   set: {
     interval: {
       name: '새로고침 간격 (초)',
+      description: '게시판을 새로 고칠 간격입니다, 간격이 짧다면 차단될 수 있습니다',
       default: 1,
       min: 0.5,
       max: 30
     },
     thread: {
-      name: '스레드',
+      name: '미리보기 스레드',
+      description: '미리보기 내용을 요청하는 스레드입니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
       min: 1,
       max: 10
     },
     retries: {
-      name: '재시도 횟수',
+      name: '미리보기 재시도 횟수',
+      description: '미리보기 내용을 불러올 때 시도 횟수를 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
       min: 1,
       max: 10
     },
     limit_cache: {
-      name: '최대 캐시 수',
+      name: '미리보기 캐시 수',
+      description: '미리보기 내용 몇 개까지 캐시할 지 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 1000,
       min: 1000,
       max: 100000
     },
     limit_items: {
       name: '최대 게시글 수',
+      description: '한 페이지에 게시글을 몇 개까지 보일지 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 50,
       min: 1,
       max: 1000
@@ -43,7 +48,8 @@ set.live = {
 
 // 요소 숨기기 설정
 set.hide = {
-  name: '숨길 요소',
+  name: '요소',
+  description: '페이지에서 숨길 요소를 선택합니다',
   set: {
     ad: {
       name: '광고',
@@ -137,24 +143,31 @@ set.style = {
   set: {
     animation_speed: {
       name: '애니메이션 속도 (초)',
+      description: '애니메이션 속도를 지정합니다, 값이 0 이라면 비활성화합니다',
       default: 0.25,
       min: 0,
       max: 2
     },
     font_family_sans: {
       name: '산세리프 글꼴',
-      default: '"맑은 고딕", sans-serif'
+      default: '"나눔스퀘어", "나눔바른고딕", "나눔고딕", "맑은 고딕", sans-serif'
     },
     font_family_serif: {
       name: '세리프 글꼴',
-      default: 'serif'
+      default: '"나눔명조", serif'
     },
     font_family_monospace: {
       name: '고정폭 글꼴',
-      default: '"D2Coding", NanumGothicCoding, monospace'
+      default: '"D2Coding ligature", "D2Coding", "나눔고딕코딩", monospace'
+    },
+    font_size: {
+      name: '글자 크기',
+      description: '사이트 전반적인 글자의 크기입니다',
+      default: '13px'
     },
     font_size_preview: {
-      name: '프리뷰 글자 크기',
+      name: '미리보기 글자 크기',
+      description: '미리보기 속 글자 크기입니다',
       default: '1.5em'
     }
   }
@@ -166,7 +179,7 @@ set.debug = {
   set: {
     less: {
       name :'Less',
-      default: true
+      default: false
     }
   }
 }

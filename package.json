@@ -1,6 +1,6 @@
 {
   "name": "koolside",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "디시인사이드 도우미",
   "scripts": {
     "lint": "eslint --fix src/**/*",
@@ -26,6 +26,7 @@
     "@babel/preset-env": "^7.7.7",
     "@babel/preset-typescript": "^7.7.7",
     "@babel/runtime": "^7.7.7",
+    "@types/file-saver": "^2.0.1",
     "@types/node": "^13.1.1",
     "@types/string-format": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.13.0",
@@ -43,6 +44,7 @@
   "dependencies": {
     "dot-prop": "^5.2.0",
     "eslint-plugin-simple-import-sort": "^5.0.0",
+    "file-saver": "^2.0.2",
     "p-limit": "^2.2.1",
     "p-retry": "^4.2.0",
     "query-string": "^6.9.0",

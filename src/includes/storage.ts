@@ -34,7 +34,19 @@ export default class Storage {
 
   get<T = Storable> (key: string) {
     const value = dotProp.get<T>(this.storage, key)
-    return value === null ? dotProp.get<T>(this.opts.defaultValue, key) : value
+    const defaultValue = dotProp.get<T>(this.opts.defaultValue, key)
+
+    if ([undefined, null].includes(value)) {
+      return defaultValue
+    }
+
+    if (typeof value !== typeof defaultValue) {
+      console.warn(`Storage ${key} mismatched, set to default (${value} !== ${defaultValue})`)
+      this.set(key, defaultValue)
+      return defaultValue
+    }
+
+    return value
   }
 
   set (key: string, value: Storable) {

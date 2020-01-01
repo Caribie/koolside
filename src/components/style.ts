@@ -37,8 +37,10 @@ const template =  /* less */`
   }
 
   body,
-  .gall_list,
+  .gall_list, .gall_tit, .gall_writer,
   button, input, select, table, textarea {
+    line-height: {font_size};
+    font-size: {font_size};
     font-family: @font-sans;
   }
 
@@ -199,9 +201,8 @@ const template =  /* less */`
       width: 100%;
       min-width: 400px;
       max-width: 600px;
-      height: 100%;
-      min-height: 300px;
       max-height: 80%;
+      padding: 1em 0;
       border-radius: 5px;
       background: darken(@color-primary, 25%);
       box-shadow: 0 0 100% black;
@@ -209,9 +210,21 @@ const template =  /* less */`
       cursor: initial;
     }
 
+    summary {
+      display: block;
+      padding: .5em;
+      font-weight: bold;
+      cursor: pointer;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
     .ks-config-item {
       box-sizing: border-box;
-      padding: 0.5em 1em;
+      padding: .5em;
+      padding-left: 1.5em;
       
       &:nth-child(even) {
         background: rgba(0, 0, 0, .15);
@@ -238,6 +251,20 @@ const template =  /* less */`
       }
 
       .ks-clearfix();
+    }
+
+    .ks-config-buttons {
+      padding: 1em;
+      padding-bottom: 0;
+
+      button {
+        display: inline-block;
+        padding: .5em;
+        background: darken(@color-primary, 35%);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+      }
     }
     
     &.ks-active {
