@@ -2,6 +2,7 @@ import componentConfig from './components/config'
 import componentContext from './components/context'
 import componentPreview from './components/preview'
 import componentStyle from './components/style'
+import componentTooltip from './components/tooltip'
 import cache from './includes/cache'
 import Config from './includes/config'
 import { fetchList, fetchPosts } from './includes/request'
@@ -15,8 +16,9 @@ async function main () {
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentStyle.create()
-  componentConfig.create()
+  componentTooltip.create()
   componentContext.create()
+  componentConfig.create()
   componentPreview.create()
 
   if (document.querySelector('.gall_list')) {

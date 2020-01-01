@@ -16,8 +16,9 @@ function generateItems (set: ConfigSet, keys?: string) {
     if ('set' in item) {
       // 카테고리라면 헤더와 하위 아이템 추가하기
       const i = 2 + (keys.match(/\./g) || []).length // 헤더 번호 (<h1>, <h2>, <h3>...)
+
       result.push(/* html */`
-        <details style="padding-left: ${i/2}em">
+        <details style="padding-left:${i/2}em">
           <summary>${item.name}</summary>
           ${generateItems(item.set, `${keys}${k}.`).join('\n')}
         </details>
@@ -29,6 +30,7 @@ function generateItems (set: ConfigSet, keys?: string) {
 
       let html = ''
 
+      // 자료형에 따라 태그 설정하기
       if (typeof value === 'string') {
         const placeholder = Config.getOpt(key, 'placeholder') || '' 
 
@@ -57,7 +59,7 @@ function generateItems (set: ConfigSet, keys?: string) {
         if (step) {
           html = /* html */`
             <label>${item.name}</label>
-            <input type="range" value="${value}" min="${min}" max="${max}" step="${step}" data-key="${key}">
+            <input type="range" value="${value}" min="${min}" max="${max}" step="${step}" data-tooltip="${value}" data-key="${key}">
           `
         } else {
           html = /* html */`
@@ -84,7 +86,7 @@ function generateItems (set: ConfigSet, keys?: string) {
         item.onChange(null, Config.get(key))
       }
 
-      result.push(`<div class="ks-config-item ks-config-key" title="${item.description || key}">${html}</div>`)
+      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description || key}">${html}</div>`)
     }
   }
 
@@ -104,6 +106,11 @@ function update (this: HTMLInputElement) {
       break
     case 'number':
       newValue = parseInt(this.value, 10)
+
+      if (this.getAttribute('type') === 'range') {
+        this.dataset.tooltip = this.value
+      }
+
       break
     default:
       newValue = this.value
@@ -156,6 +163,10 @@ const componentConfig: Component = {
     // 설정 값 변경 이벤트
     for (let input of wrapper.querySelectorAll('input, textarea') as NodeListOf<HTMLInputElement>) {
       input.addEventListener('change', update)
+
+      if (input.getAttribute('type') === 'range') {
+        input.addEventListener('input', update)
+      }
     }
 
     wrapper.querySelector('#ks-btn-reset').addEventListener('click', () => {

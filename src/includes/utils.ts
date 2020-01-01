@@ -18,6 +18,35 @@ export function getCookie (key: string) {
   return parts.length === 2 ? parts.pop().split(';').shift() : false
 }
 
+export function getElementParents (el: HTMLElement) {
+  let parents = []
+  
+  while (el.parentNode) {
+    const parent = el.parentNode as HTMLElement
+
+    // 노드가 더 이상 요소가 아니라면 루프 끝내기
+    if (parent.nodeType !== Node.ELEMENT_NODE) {
+      break
+    }
+
+    parents.push(parent)
+    el = parent
+  }
+
+  return parents
+}
+
+export function getElementStyle (element: HTMLElement, prop: string) {
+  const elements = [element, ...getElementParents(element)]
+  let value
+
+  while ((!value || ['auto'].includes(value)) && elements.length) {
+    value = document.defaultView.getComputedStyle(elements.shift(), null).getPropertyValue(prop)
+  }
+
+  return value
+}
+
 export function hasAdminPermission () {
   return !!document.querySelector('.btn_useradmin_go')
 }

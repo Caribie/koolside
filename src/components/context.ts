@@ -1,7 +1,7 @@
 import FileSaver from 'file-saver'
 
 import Config from '../includes/config'
-import { createElement, deletePosts, getParameter,hasAdminPermission } from '../includes/utils'
+import { createElement, deletePosts, getElementStyle,getParameter, hasAdminPermission } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
@@ -60,9 +60,7 @@ function onContextMenu (e: MouseEvent) {
     context.style.left = `${e.x - 5}px`
 
     // 선택한 객체에 z-index 가 있다면 그보다 한 개 높게 설정하기
-    if (target.style.zIndex) {
-      context.style.zIndex = target.style.zIndex + 1
-    }
+    context.style.zIndex = getElementStyle(target, 'z-index') + 1
   }
 
   context.innerHTML = ''

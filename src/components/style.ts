@@ -133,6 +133,23 @@ const template =  /* less */`
     }
   }
 
+  #ks-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    display: inline-block;
+    padding: .5em;
+    background: darken(@color-primary, 50%);
+    border-radius: 0;
+    color: white;
+    pointer-events: none;
+
+    &.ks-active {
+      visibility: visible;
+    }
+  }
+
   #ks-contextmenu {
     transition: transform @animation-speed;
     transform: scale(0);
