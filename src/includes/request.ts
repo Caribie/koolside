@@ -176,9 +176,12 @@ export async function fetchList (gallery: string) {
     fetchedPost.dataset.no = fetchedString
 
     // 기존 게시글 요소 불러오기
-    const post = table.querySelector(`[data-post="${fetched}"]`)
+    const post = table.querySelector(`[data-no="${fetched}"]`)
 
     if (post) {
+      // 새 글 인식표 지우기
+      post.classList.remove('ks-new')
+
       // 수정된 부분만 변경하기
       for (let fetchedTd of fetchedPost.querySelectorAll('td')) {
         const selector = fetchedTd.className.match(/(gall_\w+)/)[1]
@@ -224,8 +227,8 @@ export async function fetchList (gallery: string) {
       break
     }
 
-    // 이미 삭제된 게시글이면 무시하기
-    if (post.matches('.ks-deleted')) {
+    // 방금 추가된 글이거나 이미 삭제된 게시글이면 무시하기
+    if (post.matches('.ks-new, .ks-deleted')) {
       continue
     }
 
