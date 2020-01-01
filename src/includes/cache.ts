@@ -1,4 +1,4 @@
-import config from './config'
+import Config from './config'
 
 interface CacheSet {
   id: string;
@@ -101,7 +101,7 @@ class Cache extends Array<CacheSet> {
       idx = this.push({ id, post, html })
     
       // 캐시가 최대 수에 도달하면 마지막 아이템 한개씩 제거하기
-      if (this.length > config.get<number>('live.limit_cache')) {
+      if (this.length > Config.get<number>('live.limit_cache')) {
         this.shift()
       }
     }

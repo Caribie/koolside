@@ -1,7 +1,7 @@
 import FileSaver from 'file-saver'
 
 import cache from '../includes/cache'
-import config, { configOption, set } from '../includes/config'
+import Config, { set } from '../includes/config'
 import { createElement } from '../includes/utils'
 import componentStyle from './style'
 
@@ -25,14 +25,14 @@ function generateItems (set: ConfigSet, keys?: string) {
     } else {
       // 아이템 추가하기
       const key = `${keys}${k}`
-      const value = config.get(key)
+      const value = Config.get(key)
 
       let html = ''
 
       if (typeof value === 'string') {
-        const placeholder = configOption(key, 'placeholder') || '' 
+        const placeholder = Config.getOpt(key, 'placeholder') || '' 
 
-        if (configOption(key, 'textarea')) {
+        if (Config.getOpt(key, 'textarea')) {
           html = /* html */`
             <label>${item.name}</label>
             <textarea 
@@ -50,18 +50,21 @@ function generateItems (set: ConfigSet, keys?: string) {
           `
         }
       } else if (typeof value === 'number') {
-        const min = configOption<number>(key, 'min')
-        const max = configOption<number>(key, 'max')
+        const min = Config.getOpt<number>(key, 'min') || ''
+        const max = Config.getOpt<number>(key, 'max') || ''
+        const step = Config.getOpt<number>(key, 'step') || ''
 
-        html = /* html */`
-          <label>${item.name}</label>
-          <input 
-            type="number"
-            value="${value}"
-            ${ typeof min === 'number' ? `min="${min}"` : '' }
-            ${ typeof max === 'number' ? `min="${max}"` : '' }
-            data-key="${key}">
+        if (step) {
+          html = /* html */`
+            <label>${item.name}</label>
+            <input type="range" value="${value}" min="${min}" max="${max}" step="${step}" data-key="${key}">
           `
+        } else {
+          html = /* html */`
+            <label>${item.name}</label>
+            <input type="number" value="${value}" min="${min}" max="${max}" step="${step}">
+          `
+        }
       } else if (typeof value === 'boolean') {
         html = /* html */`
           <label>
@@ -78,7 +81,7 @@ function generateItems (set: ConfigSet, keys?: string) {
 
       // 변경 시 실행될 값이 있다면 초기화를 위해 실행하기
       if (item.onChange) {
-        item.onChange(null, config.get(key))
+        item.onChange(null, Config.get(key))
       }
 
       result.push(`<div class="ks-config-item ks-config-key" title="${item.description || key}">${html}</div>`)
@@ -90,7 +93,7 @@ function generateItems (set: ConfigSet, keys?: string) {
 
 function update (this: HTMLInputElement) {
   const key = this.dataset.key
-  const oldValue = config.get(key)
+  const oldValue = Config.get(key)
 
   let newValue
 
@@ -103,13 +106,13 @@ function update (this: HTMLInputElement) {
   if (oldValue !== newValue) {
     // 변경시 실행할 함수가 있다면 실행하기
     console.log(`${key}: ${oldValue} -> ${newValue}`)
-    const onChange = configOption<Function>(key, 'onChange')
+    const onChange = Config.getOpt<Function>(key, 'onChange')
     if (onChange) {
       onChange(oldValue, newValue)
     }
 
-    config.set(key, newValue)
-    config.sync()
+    Config.set(key, newValue)
+    Config.sync()
   }
 
   // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
@@ -154,7 +157,7 @@ const componentConfig: Component = {
 
     wrapper.querySelector('#ks-btn-reset').addEventListener('click', () => {
       if (confirm('정말로 설정을 처음으로 되돌리시겠습니까?')) {
-        config.reset()
+        Config.reset()
 
         if (confirm('새 설정을 적용하기 위해선 페이지를 다시 불러와야합니다, 새로 고치시겠습니까?')) {
           location.reload()
@@ -170,7 +173,7 @@ const componentConfig: Component = {
 
     wrapper.querySelector('#ks-btn-export').addEventListener('click', () => {
       const filename = `koolside-${+new Date()}.json`
-      const file = new File([JSON.stringify(config.export())], filename, {
+      const file = new File([JSON.stringify(Config.export())], filename, {
         type: 'application/json;charset=utf-8'
       })
 
@@ -186,7 +189,7 @@ const componentConfig: Component = {
       }
 
       try {
-        config.import(JSON.parse(data))
+        Config.import(JSON.parse(data))
       } catch (e) {
         console.error(e)
         alert('JSON 데이터가 잘못됐습니다')

@@ -1,6 +1,6 @@
 import format from 'string-format'
 
-import config from '../includes/config'
+import Config from '../includes/config'
 import { createElement } from '../includes/utils'
 
 const template =  /* less */`
@@ -243,23 +243,18 @@ const template =  /* less */`
         cursor: pointer;
       }
 
-      > input {
+      > input, textarea {
         float: right;
         display: inline-block;
+        margin: 0;
+        width: 50%;
         border: 0;
         box-sizing: border-box;
         background: lighten(@color-primary, 5%);
         font-family: @font-monospace;
       }
       > textarea {
-        float: right;
-        display: inline-block;
-        width: 50%;
         resize: vertical;
-        border: 0;
-        box-sizing: border-box;
-        background: lighten(@color-primary, 5%);
-        font-family: @font-monospace;
 
         &::placeholder {
           color: darken(@color-primary, 5%);
@@ -298,10 +293,11 @@ const template =  /* less */`
     left: 0;
     overflow: hidden;
     overflow-y: auto;
+    display: inline-block;
     visibility: hidden;
     padding: 1em;
     max-width: 500px;
-    max-height: 250px;
+    max-height: 500px;
     opacity: 0;
     background: black;
     box-shadow: 0 0 5px black;
@@ -356,10 +352,10 @@ const template =  /* less */`
 const componentStyle: Component = {
   create () {
     const style = createElement('<style id="ks-style" type="text/less"></style>')
-    style.innerHTML = format(template, config.get('style'))
+    style.innerHTML = format(template, Config.get('style'))
     document.head.append(style)
 
-    if (config.get('debug.less')) {
+    if (Config.get('debug.less')) {
       less.options.env = 'development'
     }
 

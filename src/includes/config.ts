@@ -1,13 +1,16 @@
 import dotProp from 'dot-prop'
 
-import Storage from './storage'
-
-export const set: ConfigSet = {}
+export const set = {} as ConfigSet
 
 // 게시판 관련 설정
 set.live = {
-  name: '게시판',
+  name: '실시간 게시판',
   set: {
+    enabled: {
+      name: '활성화',
+      description: '실시간 게시판 기능을 활성화합니다',
+      default: true
+    },
     interval: {
       name: '새로고침 간격 (초)',
       description: '게시판을 새로 고칠 간격입니다, 간격이 짧다면 차단될 수 있습니다',
@@ -42,6 +45,19 @@ set.live = {
       default: 50,
       min: 1,
       max: 1000
+    }
+  }
+}
+
+set.preview = {
+  name: '미리보기',
+  set: {
+    offset: {
+      name: '마우스 이격 거리',
+      default: 10,
+      step: 1,
+      min: 10,
+      max: 500
     }
   }
 }
@@ -216,33 +232,39 @@ set.debug = {
 }
 
 /**
- * 설정 옵션 값을 가져옵니다 (name, default 등)
- * @param key 설정 키
- * @param option 설정 옵션
- */
-export function configOption<T> (key: string, option: string) {
-  key = `${key.replace(/\./g, '.set.')}.${option}`
-  return dotProp.get<T>(set, key)
-}
-
-/**
  * 
  * @param set 설정 데이터
  */
-function defaultValue (set: ConfigSet) {
+function defaultValues (set: ConfigSet) {
   const result = {} as LooseObject
 
   for (let k in set) {
     const config = set[k]
-    result[k] = 'set' in config ? defaultValue(config.set) : config.default
+    result[k] = 'set' in config ? defaultValues(config.set) : config.default
   }
 
   return result
 }
 
-const config = new Storage('config', {
-  defaultValue: defaultValue(set),
-  onSync () {
+class Config {
+  private static storage: LooseObject = {}
+  private static defaultValues = defaultValues(set)
+
+  /**
+   * 설정을 초기화합니다
+   */
+  static reset () {
+    GM_setValue('config', this.defaultValues)
+
+    this.storage = this.defaultValues
+  }
+
+  /**
+   * 런타임으로 돌아가는 설정을 저장소와 동기화합니다
+   */
+  static sync () {
+    GM_setValue('config', this.storage)
+
     const classes = []
 
     if (this.get('hide.ad')) classes.push('ks-hide-ad')
@@ -269,6 +291,65 @@ const config = new Storage('config', {
 
     document.body.setAttribute('class', classes.join(' '))
   }
-})
 
-export default config
+  /**
+   * 설정의 옵션을 가져옵니다
+   * @param key 키
+   * @param opt 옵션명
+   */
+  static getOpt<T = Storable> (key: string, opt: string) {
+    key = `${key.replace(/\./g, '.set.')}.${opt}`
+    return dotProp.get<T>(set, key)
+  }
+
+  /**
+   * 설정 값을 가져옵니다
+   * @param key 키
+   */
+  static get<T = Storable> (key: string) {
+    const value = dotProp.get<T>(this.storage, key)
+    const defaultValue = dotProp.get<T>(this.defaultValues, key)
+
+    // 값이 설정되지 않았다면 기본 값 반환하기
+    if ([undefined, null].includes(value)) {
+      return defaultValue
+    }
+
+    // 기본 값과 자료형이 일치하지 않는다면 기본 값으로 설정하고 반환하기
+    if (typeof value !== typeof defaultValue) {
+      console.warn(`Storage ${key} mismatched, set to default (${value} !== ${defaultValue})`)
+      this.set(key, defaultValue)
+      return defaultValue
+    }
+
+    return value
+  }
+
+  /**
+   * 설정을 정의합니다
+   * @param key 키
+   * @param value 값
+   */
+  static set (key: string, value: Storable) {
+    dotProp.set(this.storage, key, value)
+    this.sync()
+  }
+
+  /**
+   * 런타임으로 돌아가는 설정을 반환합니다
+   */
+  static export () {
+    return this.storage
+  }
+
+  /**
+   * 설정을 불러옵니다
+   * @param storage 새 설정 값
+   */
+  static import (storage: LooseObject) {
+    this.storage = storage
+    this.sync()
+  }
+}
+
+export default Config

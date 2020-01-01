@@ -1,4 +1,5 @@
 import cache from '../includes/cache'
+import Config from '../includes/config'
 import { createElement, getParameter } from '../includes/utils'
 
 function onMouseEvent (e: MouseEvent) {
@@ -53,12 +54,14 @@ function onMouseEvent (e: MouseEvent) {
       const postRect = post.getBoundingClientRect()
 
       const top = scrollTop + (postRect.top + postRect.height / 2) - (previewRect.height / 2)
-      const offset = 
+      
+      const xOffset = Config.get<number>('preview.offset')
+      const yOffset = 
         Math.min(0, top - scrollTop) + // Top
         Math.max(0, (top + previewRect.height) - (scrollTop + body.clientHeight)) // Bottom
 
-      preview.style.top = `${top - offset}px`
-      preview.style.left = `${e.pageX + 25}px`
+      preview.style.top = `${top - yOffset}px`
+      preview.style.left = `${e.pageX + xOffset}px`
     }
   } else {
     // 프리뷰 박스 초기화

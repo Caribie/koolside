@@ -3,7 +3,7 @@ import componentContext from './components/context'
 import componentPreview from './components/preview'
 import componentStyle from './components/style'
 import cache from './includes/cache'
-import config from './includes/config'
+import Config from './includes/config'
 import { fetchList, fetchPosts } from './includes/request'
 import { delay,getParameter } from './includes/utils'
 
@@ -11,7 +11,7 @@ async function main () {
   const gallery = getParameter('id')
 
   // 설정 맞추기
-  config.sync()
+  Config.sync()
 
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentStyle.create()
@@ -43,7 +43,7 @@ async function main () {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const interval = config.get<number>('live.interval') * 1000
+      const interval = Config.get<number>('live.interval') * 1000
       await fetchList(gallery).catch(console.error)
       await delay(interval)
     }

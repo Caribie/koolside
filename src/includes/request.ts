@@ -2,7 +2,7 @@ import pLimit from 'p-limit'
 import pRetry from 'p-retry'
 
 import cache from './cache'
-import config from './config'
+import Config from './config'
 import { createElement, hasAdminPermission } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
@@ -118,10 +118,10 @@ export async function fetchPost (gallery: string, post: number | string) {
  */
 export async function fetchPosts (gallery: string, posts: (number|string)[]) {
   const promises = []
-  const limit = pLimit(config.get<number>('live.thread'))
+  const limit = pLimit(Config.get<number>('live.thread'))
 
   for (let post of posts) {
-    const retries = config.get<number>('live.retries')
+    const retries = Config.get<number>('live.retries')
     const promise = () => fetchPost(gallery, post)
     const retry = pRetry(promise, {
       retries,
@@ -208,7 +208,7 @@ export async function fetchList (gallery: string) {
   }
 
   // 최대 글 수를 넘어서면 마지막 글 부터 제거하기
-  const limit = config.get<number>('live.limit_items')
+  const limit = Config.get<number>('live.limit_items')
   const overflowed = table.querySelectorAll('tr:not([data-notice])').length - limit
 
   for (let i = 0; i < overflowed; i++) {

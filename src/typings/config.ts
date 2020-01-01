@@ -1,5 +1,5 @@
 
-interface Config {
+interface ConfigItem {
   /** 이름 */
   name: string;
 
@@ -11,11 +11,11 @@ interface Config {
   onChange?<T = any>(oldValue: T, newValue: T): void;
 }
 
-interface ConfigRecursive extends Config {
+interface ConfigRecursive extends ConfigItem {
   set: ConfigSet;
 }
 
-interface ConfigString extends Config {
+interface ConfigString extends ConfigItem {
   /** 기본 값 */
   default: string;
 
@@ -26,7 +26,7 @@ interface ConfigString extends Config {
   textarea?: boolean;
 }
 
-interface ConfigNumber extends Config {
+interface ConfigNumber extends ConfigItem {
   /** 기본 값 */
   default: number;
 
@@ -35,9 +35,12 @@ interface ConfigNumber extends Config {
 
   /** 최대 값 */
   max?: number;
+
+  /** 단계 */
+  step?: number;
 }
 
-interface ConfigBoolean extends Config {
+interface ConfigBoolean extends ConfigItem {
   /** 기본 값 */
   default: boolean;
 }

@@ -1,6 +1,6 @@
 import FileSaver from 'file-saver'
 
-import config from '../includes/config'
+import Config from '../includes/config'
 import { createElement, deletePosts, getParameter,hasAdminPermission } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
@@ -38,7 +38,7 @@ function onContextMenu (e: MouseEvent) {
   context.classList.remove('ks-active')
 
   // 비활성화 요소 확인하기
-  const disableSelectors = config.get<string>('context.disable_selectors').split(/\n/g)
+  const disableSelectors = Config.get<string>('context.disable_selectors').split(/\n/g)
 
   for (let selector of disableSelectors) {
     if (selector && target.matches(selector)) {
@@ -127,28 +127,28 @@ function onContextMenu (e: MouseEvent) {
 
     const searchUrl = encodeURIComponent('http://fuckcors.iwinv.net/' + url)
 
-    if (config.get('context.image_search_google')) {
+    if (Config.get('context.image_search_google')) {
       items.push({
         name: '이미지 Google 검색',
         url: `https://www.google.com/searchbyimage?safe=off&image_url=${searchUrl}`
       })
     }
 
-    if (config.get('context.image_search_yandex')) {
+    if (Config.get('context.image_search_yandex')) {
       items.push({
         name: '이미지 Yandex 검색',
         url: `https://yandex.com/images/search?rpt=imageview&url=${searchUrl}`
       })
     }
     
-    if (config.get('context.image_search_iqdb')) {
+    if (Config.get('context.image_search_iqdb')) {
       items.push({
         name: '이미지 IQDB 검색',
         url: `https://iqdb.org/?url=${searchUrl}`
       })
     }
 
-    if (config.get('context.image_search_saucenao')) {
+    if (Config.get('context.image_search_saucenao')) {
       items.push({
         name: '이미지 SauceNao 검색',
         url: `https://saucenao.com/search.php?db=999&dbmaski=32768&url=${searchUrl}`
