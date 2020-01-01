@@ -1,3 +1,6 @@
+import FileSaver from 'file-saver'
+
+import config from '../includes/config'
 import { createElement, deletePosts, getParameter,hasAdminPermission } from '../includes/utils'
 
 function onClick (e: MouseEvent) {
@@ -31,14 +34,9 @@ function onSelectionChange () {
 function onContextMenu (e: MouseEvent) {
   const target = e.target as HTMLElement
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
-  const nativeTags = ['IMG']
 
   // 설정 화면에선 무시하기
   if (target.closest('#ks-config')) {
-    context.classList.remove('ks-active')
-    return
-  } else if (nativeTags.includes(target.tagName)) {
-    // 특정 태그에선 기본 컨텍스 메뉴만 사용하기
     context.classList.remove('ks-active')
     return
   } else if (target.closest('#ks-contextmenu') === context) {
@@ -85,22 +83,74 @@ function onContextMenu (e: MouseEvent) {
     checkedPosts.push(post.dataset.no)
   }
 
-  // 주소라면
-  const link = target.closest('a')
-
-  if (link || post) {
-    const url = link?.getAttribute('href') || `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
+  // 주소 또는 게시글을 선택했다면
+  if (post || target.hasAttribute('href') || target.hasAttribute('src')) {
+    const url = 
+      target.getAttribute('href') // 일반 주소
+      || target.getAttribute('src') // 이미지 주소
+      || `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
 
     items.push({
       name: '새 탭에서 열기',
       url
     })
 
+    items.push({
+      name: '주소 복사',
+      onClick () {
+        clipboard.writeText(url)
+      }
+    })
+  }
+
+  // 이미지를 선택했다면
+  if (target.matches('img')) {
+    const url = target.getAttribute('src')
+
     items.push({})
+    items.push({
+      name: '이미지 저장',
+      onClick () {
+        // 이미지 이름 찾기
+        FileSaver.saveAs(url)
+      }
+    })
+
+    const searchUrl = encodeURIComponent('http://fuckcors.iwinv.net/' + url)
+
+    if (config.get('context.image_search_google')) {
+      items.push({
+        name: '이미지 Google 검색',
+        url: `https://www.google.com/searchbyimage?safe=off&image_url=${searchUrl}`
+      })
+    }
+
+    if (config.get('context.image_search_yandex')) {
+      items.push({
+        name: '이미지 Yandex 검색',
+        url: `https://yandex.com/images/search?rpt=imageview&url=${searchUrl}`
+      })
+    }
+    
+    if (config.get('context.image_search_iqdb')) {
+      items.push({
+        name: '이미지 IQDB 검색',
+        url: `https://iqdb.org/?url=${searchUrl}`
+      })
+    }
+
+    if (config.get('context.image_search_saucenao')) {
+      items.push({
+        name: '이미지 SauceNao 검색',
+        url: `https://saucenao.com/search.php?db=999&dbmaski=32768&url=${searchUrl}`
+      })
+    }
   }
 
   // 게시글이 존재한다면
   if (post) {
+    items.push({})
+
     const writer = post.querySelector<HTMLElement>('.gall_writer')
     const author = writer.dataset.nick
     const authorId = writer.dataset.uid || writer.dataset.ip
@@ -127,6 +177,8 @@ function onContextMenu (e: MouseEvent) {
     }
   }
 
+  items.push({})
+
   // 선택한 텍스트가 존재한다면
   if (selectedText) {
     items.push({
@@ -151,7 +203,6 @@ function onContextMenu (e: MouseEvent) {
 
   // 관리 권한이 있다면
   if (hasAdminPermission()) {
-    // 스플리터
     items.push({})
 
     if (post?.matches(':not(.ks-deleted)')) {

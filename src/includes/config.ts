@@ -46,6 +46,30 @@ set.live = {
   }
 }
 
+// 우 클릭 메뉴 설정
+set.context = {
+  name: '메뉴',
+  description: '오른쪽 클릭 했을 때 출력되는 메뉴 관련 설정',
+  set: {
+    image_search_google: {
+      name: '이미지 Google 검색',
+      default: true
+    },
+    image_search_yandex: {
+      name: '이미지 Yandex 검색',
+      default: true
+    },
+    image_search_iqdb: {
+      name: '이미지 IQDB 검색',
+      default: true
+    },
+    image_search_saucenao: {
+      name: '이미지 SauceNao 검색',
+      default: true
+    }
+  }
+}
+
 // 요소 숨기기 설정
 set.hide = {
   name: '요소',

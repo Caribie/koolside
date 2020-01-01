@@ -145,7 +145,8 @@ const template =  /* less */`
     position: fixed;
     top: 0;
     left: 0;
-    width: 150px;
+    display: inline-block;
+    max-width: 500px;
     max-height: 300px;
     border-radius: 5px;
     background: @color-primary;
