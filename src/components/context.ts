@@ -35,13 +35,22 @@ function onContextMenu (e: MouseEvent) {
   const target = e.target as HTMLElement
   const context = document.querySelector<HTMLElement>('#ks-contextmenu')
 
-  // 설정 화면에선 무시하기
+  context.classList.remove('ks-active')
+
+  // 비활성화 요소 확인하기
+  const disableSelectors = config.get<string>('context.disable_selectors').split(/\n/g)
+
+  for (let selector of disableSelectors) {
+    if (selector && target.matches(selector)) {
+      return
+    }
+  }
+
   if (target.closest('#ks-config')) {
-    context.classList.remove('ks-active')
+    // 설정 화면에선 무시하기
     return
   } else if (target.closest('#ks-contextmenu') === context) {
     // 컨텍스 메뉴 켜진 상태에서 한번 더 열었다면 네이티브 컨텍스 열기
-    context.classList.remove('ks-active')
     return
   } else {
     context.classList.add('ks-active')

@@ -19,6 +19,9 @@ interface ConfigString extends Config {
   /** 기본 값 */
   default: string;
 
+  /** 값이 없을 때 보여질 내용 */
+  placeholder?: string;
+
   /** 설정에 <textarea> 태그를 사용할지? */
   textarea?: boolean;
 }

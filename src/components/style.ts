@@ -239,16 +239,31 @@ const template =  /* less */`
       label {
         float: left;
         display: inline-block;
+        width: 50%;
         cursor: pointer;
       }
 
       > input {
         float: right;
         display: inline-block;
-        border: 1px solid rgba(0, 0, 0, .15);
-        background: darken(@color-primary, 25%);
+        border: 0;
+        box-sizing: border-box;
+        background: lighten(@color-primary, 5%);
         font-family: @font-monospace;
-        color: white;
+      }
+      > textarea {
+        float: right;
+        display: inline-block;
+        width: 50%;
+        resize: vertical;
+        border: 0;
+        box-sizing: border-box;
+        background: lighten(@color-primary, 5%);
+        font-family: @font-monospace;
+
+        &::placeholder {
+          color: darken(@color-primary, 5%);
+        }
       }
 
       .ks-clearfix();

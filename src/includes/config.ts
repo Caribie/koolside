@@ -51,6 +51,13 @@ set.context = {
   name: '메뉴',
   description: '오른쪽 클릭 했을 때 출력되는 메뉴 관련 설정',
   set: {
+    disable_selectors: {
+      name: '비활성화 요소',
+      description: '특정 요소에서 메뉴를 비활성화합니다',
+      default: '',
+      placeholder: 'img[src]\na[href]\n...',
+      textarea: true
+    },
     image_search_google: {
       name: '이미지 Google 검색',
       default: true
