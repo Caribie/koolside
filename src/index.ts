@@ -1,6 +1,5 @@
 import componentConfig from './components/config'
 import componentContext from './components/context'
-import componentPreview from './components/preview'
 import componentStyle from './components/style'
 import componentTooltip from './components/tooltip'
 import cache from './includes/cache'
@@ -19,7 +18,6 @@ async function main () {
   componentTooltip.create()
   componentContext.create()
   componentConfig.create()
-  componentPreview.create()
 
   if (document.querySelector('.gall_list')) {
     // 기존 게시글 목록 데이터 셋 초기화하기
@@ -46,7 +44,11 @@ async function main () {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const interval = Config.get<number>('live.interval') * 1000
-      await fetchList(gallery).catch(console.error)
+
+      if (Config.get('live.enabled')) {
+        await fetchList(gallery).catch(console.error)
+      }
+
       await delay(interval)
     }
   }

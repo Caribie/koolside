@@ -1,5 +1,6 @@
 import dotProp from 'dot-prop'
 
+import componentPreview from '../components/preview'
 import { createElement,formatFont } from './utils'
 
 export const set = {} as ConfigSet
@@ -54,9 +55,21 @@ set.live = {
 set.preview = {
   name: '미리보기',
   set: {
+    enabled: {
+      name: '활성화',
+      description: '미리보기 기능을 활성화합니다',
+      default: true,
+      onChange (_, value) {
+        componentPreview.destroy()
+
+        if (value) {
+          componentPreview.create()
+        }
+      }
+    },
     offset: {
       name: '마우스 이격 거리',
-      default: 10,
+      default: 100,
       step: 1,
       min: 10,
       max: 500
@@ -242,9 +255,10 @@ set.style = {
       onChange (_, value) {
         document.querySelector('#ks-style-custom')?.remove()
 
-        const component = createElement('<style id="ks-style-custom" type="text/less"></style>')
-        component.innerHTML = value
-        document.head.append(component)
+        if (value.trim()) {
+          const component = createElement(`<style id="ks-style-custom" type="text/less">${value}</style>`)
+          document.head.append(component)
+        }
       }
     }
   }
@@ -273,7 +287,7 @@ function defaultValues (set: ConfigSet) {
 }
 
 export default class Config {
-  private static storage: LooseObject = {}
+  private static storage: LooseObject = GM_getValue('config', {})
   private static defaultValues = defaultValues(set)
 
   /**
