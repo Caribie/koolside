@@ -1,6 +1,6 @@
 import dotProp from 'dot-prop'
 
-import { formatFont } from './utils'
+import { createElement,formatFont } from './utils'
 
 export const set = {} as ConfigSet
 
@@ -216,7 +216,7 @@ set.style = {
       format: formatFont
     },
     font_size: {
-      name: '글자 크기',
+      name: '글자 크기 (px)',
       description: '사이트 전반적인 글자의 크기입니다',
       default: 13,
       step: 1,
@@ -225,13 +225,27 @@ set.style = {
       format: size => `${size}px`
     },
     font_size_preview: {
-      name: '미리보기 글자 크기',
+      name: '미리보기 글자 크기 (px)',
       description: '미리보기 속 글자 크기입니다',
       default: 15,
       step: 1,
       min: 10,
       max: 30,
       format: size => `${size}px`
+    },
+    custom_rules: {
+      name: '사용자 규칙',
+      description: '사용자 스타일 규칙입니다, LESS 문법도 지원합니다',
+      default: '',
+      textarea: true,
+      placeholder: 'body {\n  background: red;\n}',
+      onChange (_, value) {
+        document.querySelector('#ks-style-custom')?.remove()
+
+        const component = createElement('<style id="ks-style-custom" type="text/less"></style>')
+        component.innerHTML = value
+        document.head.append(component)
+      }
     }
   }
 }

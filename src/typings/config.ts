@@ -12,7 +12,7 @@ interface ConfigItem {
 
   /** 값 수정 됐을 때 실행할 함수 */
   // eslint-disable-next-line
-  onChange?<T = any>(oldValue: T, newValue: T): void;
+  onChange? (oldValue: any, newValue: any): void;
 }
 
 interface ConfigRecursive extends ConfigItem {
