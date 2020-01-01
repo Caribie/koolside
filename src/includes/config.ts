@@ -233,11 +233,13 @@ set.style = {
   name: '모양',
   set: {
     animation_speed: {
-      name: '애니메이션 속도 (초)',
+      name: '애니메이션 속도 (밀리 초)',
       description: '애니메이션 속도를 지정합니다, 값이 0 이라면 비활성화합니다',
-      default: 0.25,
+      default: 250,
+      step: 1,
       min: 0,
-      max: 2
+      max: 1000,
+      format: v => v / 1000
     },
     font_family_sans: {
       name: '산세리프 글꼴',
