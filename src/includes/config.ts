@@ -1,9 +1,12 @@
 import dotProp from 'dot-prop'
 
 import componentPreview from '../components/preview'
+import componentStyle from '../components/style'
 import { createElement,formatFont } from './utils'
 
 export const set = {} as ConfigSet
+
+let notificationRules: RegExp[]
 
 // 게시판 관련 설정
 set.live = {
@@ -16,38 +19,64 @@ set.live = {
     },
     interval: {
       name: '새로고침 간격 (초)',
-      description: '게시판을 새로 고칠 간격입니다, 간격이 짧다면 차단될 수 있습니다',
+      description: '게시판을 새로 고칠 간격입니다, 간격이 짧으면 차단될 수 있습니다',
       default: 1,
       min: 0.5,
       max: 30
     },
     thread: {
       name: '미리보기 스레드',
-      description: '미리보기 내용을 요청하는 스레드입니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
+      description: '미리보기 내용을 요청하는 스레드입니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
       min: 1,
       max: 10
     },
     retries: {
       name: '미리보기 재시도 횟수',
-      description: '미리보기 내용을 불러올 때 시도 횟수를 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
+      description: '미리보기 내용을 불러올 때 시도 횟수를 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
       min: 1,
       max: 10
     },
     limit_cache: {
       name: '미리보기 캐시 수',
-      description: '미리보기 내용 몇 개까지 캐시할 지 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
+      description: '미리보기 내용 몇 개까지 캐시할 지 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 1000,
       min: 1000,
       max: 100000
     },
     limit_items: {
       name: '최대 게시글 수',
-      description: '한 페이지에 게시글을 몇 개까지 보일지 선택합니다, 너무 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
+      description: '한 페이지에 게시글을 몇 개까지 보일지 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 50,
       min: 1,
       max: 1000
+    },
+    notification: {
+      name: '푸시 알림 활성화',
+      description: '제목, 내용이 규칙과 일치하면 브라우저 알림을 울립니다',
+      default: true
+    },
+    notification_rules: {
+      name: '푸시 알림 규칙',
+      description: '정규표현식으로 한 줄에 한 규칙 씩 들어갑니다, 많이 추가하면 메모리 사용량이 증가할 수 있습니다',
+      default: '',
+      textarea: true,
+      placeholder: '\\w망호',
+      format: () => notificationRules,
+      onChange (_, value: string) {
+        notificationRules = []
+
+        if (!value) {
+          return
+        }
+
+        for (let rule of value.split(/\n/g)) {
+          if (rule.trim()) {
+            notificationRules.push(new RegExp(rule))
+          } 
+        }
+      }
     }
   }
 }
@@ -337,7 +366,7 @@ export default class Config {
    * @param key 키
    * @param opt 옵션명
    */
-  static getOpt<T> (key: string, opt: string) {
+  static getOption<T> (key: string, opt: string) {
     return dotProp.get<T>(set, `${key.replace(/\./g, '.set.')}.${opt}`)
   }
 
@@ -377,7 +406,7 @@ export default class Config {
    * @param key 키
    */
   static get<T = Storable> (key: string) {
-    const format = this.getOpt<Function>(key, 'format')
+    const format = this.getOption<Function>(key, 'format')
     const value = this.getRaw<T>(key)
 
     return format ? format(value) as T : value
@@ -389,8 +418,26 @@ export default class Config {
    * @param value 값
    */
   static set (key: string, value: Storable) {
+    // 변경 시 실행할 함수가 있다면 전후 변수 인자에 넣어 실행하기
+    const oldValue = this.getRaw(key)
+
+    if (oldValue !== value) {
+      console.log(`${key} changed ${oldValue} to ${value}`)
+
+      const onChange = Config.getOption<Function>(key, 'onChange')
+      if (onChange) {
+        onChange(oldValue, value)
+      }
+    }
+
     dotProp.set(this.storage, key, value)
     this.sync()
+
+    // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
+    if (key.startsWith('style')) {
+      componentStyle.destroy()
+      componentStyle.create()
+    }
   }
 
   /**

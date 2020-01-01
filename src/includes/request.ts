@@ -1,5 +1,6 @@
 import pLimit from 'p-limit'
 import pRetry from 'p-retry'
+import Push from 'push.js'
 
 import cache from './cache'
 import Config from './config'
@@ -101,6 +102,25 @@ export async function fetchPost (gallery: string, post: number | string) {
 
   // 2개 이상 <br> 태그 한개로 변환하기
   content.innerHTML = content.innerHTML.replace(/(<br(\s+\/)?>\s{0,}){2,}/g, '<br>')
+
+  // 푸시 알림 울리기 위해 일치하는지 확인하기
+  const notifiaction = Config.get('live.notification')
+  const rules = Config.get<RegExp[]>('live.notification_rules')
+
+  if (notifiaction && rules) {
+    const title = element.querySelector('.gall_tit').textContent
+    const text = `${title}\n${content.innerHTML}`
+    
+    for (let rule of rules) {
+      if (text.match(rule)) {
+        Push.create(title, {
+          body: content.textContent,
+          link: `https://gall.dcinside.com/board/view/?id=${gallery}&no=${post}`
+        })
+        break
+      }
+    }
+  }
 
   // 캐싱하기
   cache.set(gallery, post, content)

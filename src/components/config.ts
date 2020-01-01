@@ -3,7 +3,6 @@ import FileSaver from 'file-saver'
 import cache from '../includes/cache'
 import Config, { set } from '../includes/config'
 import { createElement } from '../includes/utils'
-import componentStyle from './style'
 
 function generateItems (set: ConfigSet, keys?: string) {
   const result = [] as string[]
@@ -32,9 +31,9 @@ function generateItems (set: ConfigSet, keys?: string) {
 
       // 자료형에 따라 태그 설정하기
       if (typeof value === 'string') {
-        const placeholder = Config.getOpt(key, 'placeholder') || '' 
+        const placeholder = Config.getOption(key, 'placeholder') || '' 
 
-        if (Config.getOpt(key, 'textarea')) {
+        if (Config.getOption(key, 'textarea')) {
           html = /* html */`
             <label>${item.name}</label>
             <textarea 
@@ -52,9 +51,9 @@ function generateItems (set: ConfigSet, keys?: string) {
           `
         }
       } else if (typeof value === 'number') {
-        const min = Config.getOpt<number>(key, 'min') || ''
-        const max = Config.getOpt<number>(key, 'max') || ''
-        const step = Config.getOpt<number>(key, 'step') || ''
+        const min = Config.getOption<number>(key, 'min') || ''
+        const max = Config.getOption<number>(key, 'max') || ''
+        const step = Config.getOption<number>(key, 'step') || ''
 
         if (step) {
           html = /* html */`
@@ -83,7 +82,7 @@ function generateItems (set: ConfigSet, keys?: string) {
 
       // 변경 시 실행될 값이 있다면 초기화를 위해 실행하기
       if (item.onChange) {
-        item.onChange(null, Config.get(key))
+        item.onChange(null, Config.getRaw(key))
       }
 
       result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description || item.name}">${html}</div>`)
@@ -96,16 +95,15 @@ function generateItems (set: ConfigSet, keys?: string) {
 function update (this: HTMLInputElement) {
   const key = this.dataset.key
   const type = typeof Config.getDefaultValue(key)
-  const oldValue = Config.getRaw(key)
 
-  let newValue
+  let value
 
   switch (type) {
     case 'boolean':
-      newValue = this.checked
+      value = this.checked
       break
     case 'number':
-      newValue = parseInt(this.value, 10)
+      value = parseInt(this.value, 10)
 
       if (this.getAttribute('type') === 'range') {
         this.dataset.tooltip = this.value
@@ -113,23 +111,10 @@ function update (this: HTMLInputElement) {
 
       break
     default:
-      newValue = this.value
+      value = this.value
   }
 
-  // 변경 시 실행할 함수가 있다면 전후 변수 인자에 넣어 실행하기
-  const onChange = Config.getOpt<Function>(key, 'onChange')
-  if (onChange) {
-    onChange(oldValue, newValue)
-  }
-
-  Config.set(key, newValue)
-  Config.sync()
-
-  // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
-  if (key.startsWith('style')) {
-    componentStyle.destroy()
-    componentStyle.create()
-  }
+  Config.set(key, value)
 }
 
 const componentConfig: Component = {
