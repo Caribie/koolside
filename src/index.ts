@@ -26,7 +26,7 @@ async function main () {
     for (let post of document.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
       // 게시글 번호
       if (!post.dataset.no) {
-        post.dataset.no = post.querySelector('.gall_num')?.textContent
+        post.dataset.no = post.querySelector('.gall_num').textContent.trim() || getParameter('no')
       }
   
       // 광고
