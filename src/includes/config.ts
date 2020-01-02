@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import dotProp from 'dot-prop'
 
 import componentConfig from '../components/config'
@@ -366,8 +368,8 @@ export default class Config {
    * 설정 기본 값을 가져옵니다
    * @param key 키
    */
-  static getDefaultValue<T extends ConfigStorable> (key: string) {
-    return this.data[key].default as T
+  static getDefaultValue<T = any> (key: string) {
+    return this.data[key].default as unknown as T
   }
 
   /**
@@ -375,12 +377,12 @@ export default class Config {
    * @param key 키
    * @param defaultValue 기본 값
    */
-  static getRaw<T extends ConfigStorable> (key: string, defaultValue?: T) {
+  static getRaw<T = any> (key: string, defaultValue?: T) {
     const value = dotProp.get<T>(this.storage, key)
 
     // 함수 기본 값이 선언되지 않았을 때만 전역 기본 값 사용하기
     if (typeof defaultValue === 'undefined') {
-      defaultValue = this.getDefaultValue<T>(key)
+      defaultValue = this.getDefaultValue(key)
     }
 
     // 값이 설정되지 않았다면 기본 값 반환하기
@@ -410,9 +412,9 @@ export default class Config {
    * @param key 키
    * @param defaultValue 기본 값
    */
-  static get<T extends ConfigStorable> (key: string, defaultValue?: T) {
+  static get<T = any> (key: string, defaultValue?: T) {
     const format = this.getOption<Function>(key, 'format')
-    const value = this.getRaw<T>(key, defaultValue)
+    const value = this.getRaw(key, defaultValue)
     return (format ? format(value) : value) as T
   }
 
@@ -421,7 +423,7 @@ export default class Config {
    * @param key 키
    * @param value 값
    */
-  static set (key: string, value: ConfigStorable) {
+  static set (key: string, value: any) {
     const old = this.getRaw(key)
 
     const onUpdate = this.getOption<Function>(key, 'onUpdate')

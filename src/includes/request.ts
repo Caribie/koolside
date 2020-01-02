@@ -33,7 +33,7 @@ export default function request (opts: string | GM_RequestInfo) {
         resolve(res)
       },
       onerror: res => {
-        reject(new Error(`Request failed (${res.readyState}, ${res.status})`))
+        reject(new Error(`Request failed (${res.finalUrl}, ${res.readyState})`))
       }
     })
   })
@@ -105,7 +105,7 @@ export async function fetchPost (gallery: string, post: number | string) {
 
   // 푸시 알림 울리기 위해 일치하는지 확인하기
   const notifiaction = Config.get('live.notification')
-  const rules = Config.get<RegExp[]>('live.notification_rules')
+  const rules = Config.get('live.notification_rules')
 
   if (notifiaction && rules) {
     const title = element.querySelector('.gall_tit').textContent
