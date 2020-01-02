@@ -114,7 +114,7 @@ set.context = {
     disable_selectors: {
       name: '비활성화 요소',
       description: '특정 요소에서 메뉴를 비활성화합니다',
-      default: '',
+      default: 'iframe',
       placeholder: 'img[src]\na[href]\n...',
       textarea: true
     },
