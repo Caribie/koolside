@@ -82,6 +82,10 @@ function onContextMenu (e: MouseEvent) {
     number = post?.dataset.no
   }
 
+  const writer = post?.querySelector<HTMLElement>('.gall_writer')
+  const author = writer?.dataset.uid || writer?.dataset.ip
+  const authorInfo = `${writer?.dataset.nick} (${author})`
+
   // 선택한 게시글 번호만 불러오기
   const checkedPosts = [] as string[]
 
@@ -142,37 +146,16 @@ function onContextMenu (e: MouseEvent) {
     if (Config.get('context.image_search_iqdb')) {
       items.push({
         name: '이미지 IQDB 검색',
-        url: `https://iqdb.org/?url=${searchUrl}`
+        url: `https://iqdb.org/?url=${searchUrl}`,
+        tooltip: '그림을 검색하기 좋은 엔진입니다',
       })
     }
 
     if (Config.get('context.image_search_saucenao')) {
       items.push({
         name: '이미지 SauceNao 검색',
+        tooltip: '만화 또는 그림을 검색하기 좋은 엔진입니다',
         url: `https://saucenao.com/search.php?db=999&dbmaski=32768&url=${searchUrl}`
-      })
-    }
-  }
-
-  // 게시글이 존재한다면
-  if (post) {
-    items.push({})
-
-    const writer = post.querySelector<HTMLElement>('.gall_writer')
-    const author = writer.dataset.nick
-    const authorId = writer.dataset.uid ?? writer.dataset.ip
-
-    items.push({
-      name: '작성자 정보 복사',
-      onClick () {
-        clipboard.writeText(`${author} (${authorId})`)
-      }
-    })
-
-    if (writer.dataset.uid) {
-      items.push({
-        name: '작성자 갤로그',
-        url: `https://gallog.dcinside.com/${authorId}`
       })
     }
   }
@@ -201,6 +184,25 @@ function onContextMenu (e: MouseEvent) {
     })
   }
 
+  // 게시글이 존재한다면
+  if (post) {
+    items.push({
+      name: '작성자 정보 복사',
+      tooltip: authorInfo,
+      onClick () {
+        clipboard.writeText(authorInfo)
+      }
+    })
+
+    if (writer.dataset.uid) {
+      items.push({
+        name: '작성자 갤로그',
+        tooltip: authorInfo,
+        url: `https://gallog.dcinside.com/${author}`
+      })
+    }
+  }
+
   // 관리 권한이 있다면
   if (hasAdminPermission()) {
     items.push({})
@@ -208,6 +210,7 @@ function onContextMenu (e: MouseEvent) {
     if (post?.matches(':not(.ks-deleted)')) {
       items.push({
         name: '이 게시글 삭제',
+        tooltip: authorInfo,
         onClick () {
           if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
             deletePosts([ number ])
@@ -220,6 +223,7 @@ function onContextMenu (e: MouseEvent) {
     if (checkedPosts.length > 0) {
       items.push({
         name: '선택한 게시글 삭제',
+        tooltip: `${checkedPosts.length}개`,
         onClick () {
           if (confirm(`정말로 게시글 ${checkedPosts.length}개를 삭제하시겠습니까?`)) {
             deletePosts(checkedPosts)
@@ -255,6 +259,10 @@ function onContextMenu (e: MouseEvent) {
       li.classList.add('ks-splitter')
     } else {
       continue
+    }
+
+    if (item.tooltip) {
+      li.dataset.tooltip = item.tooltip
     }
 
     context.append(li)

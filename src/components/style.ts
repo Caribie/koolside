@@ -11,8 +11,7 @@ const template =  /* less */`
   @color-primary: #4A56A8;
   @color-crit: #f06464;
 
-
-  /* Functions */
+  /* 기능 */
   .ks-update {
       animation-name: ks-update;
       animation-duration: @animation-speed;
@@ -25,12 +24,13 @@ const template =  /* less */`
     }
   }
 
-  /* Reset */
+  /* 초기화 */
   html, body {
     width: 100%;
     height: 100%;
   }
 
+  /* 글꼴 및 글자 크기 */
   body,
   .gall_list, .gall_tit, .gall_writer,
   button, input, select, table, textarea {
@@ -221,6 +221,7 @@ const template =  /* less */`
       max-width: 600px;
       max-height: 80%;
       padding: 1em 0;
+      padding-right: 1em;
       border-radius: 5px;
       background: darken(@color-primary, 25%);
       box-shadow: 0 0 100% black;
@@ -370,7 +371,8 @@ const template =  /* less */`
 const componentStyle: Component = {
   create () {
     const style = createElement('<style id="ks-style" type="text/less"></style>')
-    style.innerHTML = template.replace(/\{([\w_]+)\}/g, (_, key) => Config.get(`style.${key}`))
+    const formatted = template.replace(/\{([\w_]+)\}/g, (_, key) => Config.get(`style.${key}`))
+    style.innerHTML = formatted
     document.head.append(style)
 
     if (Config.get('debug.less')) {

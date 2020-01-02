@@ -413,7 +413,7 @@ export default class Config {
   static get<T extends ConfigStorable> (key: string, defaultValue?: T) {
     const format = this.getOption<Function>(key, 'format')
     const value = this.getRaw<T>(key, defaultValue)
-    return format ? format(value) as T : value
+    return (format ? format(value) : value) as T
   }
 
   /**
