@@ -8,7 +8,7 @@ import { createElement, hasAdminPermission } from './utils'
 
 const bodyPattern = /(?<body><body[^>]*>((.|[\n\r])*)<\/body>)/im
 
-const checkboxTemplate = createElement(/* html */`
+const checkboxTemplate = createElement(`
   <td class="gall_chk">
     <span class="checkbox">
       <input type="checkbox" name="chk_article[]" class="list_chkbox article_chkbox">

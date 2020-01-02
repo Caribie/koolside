@@ -20,7 +20,7 @@ function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: strin
 
     if ('items' in item) {
       // 헤더와 하위 아이템 추가하기
-      result.push(/* html */`
+      result.push(`
         <details style="padding-left:1em">
           <summary title=${item.description ?? item.name}>${item.name}</summary>
           ${generate(item.items, `${key}.`).join('')}
