@@ -100,7 +100,7 @@ configuration.preview = {
       name: '마우스 이격 거리',
       default: 100,
       step: 1,
-      min: 10,
+      min: -500,
       max: 500
     }
   }
