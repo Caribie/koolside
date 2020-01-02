@@ -16,8 +16,6 @@ if (window.top === window.self) {
   // 설정 맞추기
   Config.sync()
   
-  console.log(Config)
-  
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentStyle.create()
   componentTooltip.create()
@@ -31,7 +29,7 @@ if (window.top === window.self) {
     for (let post of document.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
       // 게시글 번호
       if (!post.dataset.no) {
-        post.dataset.no = post.querySelector('.gall_num').textContent.trim() ?? getParameter('no')
+        post.dataset.no = post.querySelector('.gall_num').textContent.trim() || getParameter('no')
       }
   
       // 광고
