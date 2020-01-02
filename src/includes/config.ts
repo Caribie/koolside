@@ -2,7 +2,7 @@ import dotProp from 'dot-prop'
 
 import componentConfig from '../components/config'
 import componentStyle from '../components/style'
-import { createElement,formatFont } from './utils'
+import { createElement,formatFont, range } from './utils'
 
 let notificationRules: RegExp[]
 
@@ -21,6 +21,7 @@ configuration.live = {
       name: '새로고침 간격 (초)',
       description: '게시판을 새로 고칠 간격입니다, 간격이 짧으면 차단될 수 있습니다',
       default: 1,
+      step: 0.5,
       min: 0.5,
       max: 30
     },
@@ -28,6 +29,7 @@ configuration.live = {
       name: '미리보기 스레드',
       description: '미리보기 내용을 요청하는 스레드입니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
+      step: 1,
       min: 1,
       max: 10
     },
@@ -35,6 +37,7 @@ configuration.live = {
       name: '미리보기 재시도 횟수',
       description: '미리보기 내용을 불러올 때 시도 횟수를 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 3,
+      step: 1,
       min: 1,
       max: 10
     },
@@ -42,6 +45,7 @@ configuration.live = {
       name: '미리보기 캐시 수',
       description: '미리보기 내용 몇 개까지 캐시할 지 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 1000,
+      step: 10,
       min: 1000,
       max: 100000
     },
@@ -49,6 +53,7 @@ configuration.live = {
       name: '최대 게시글 수',
       description: '한 페이지에 게시글을 몇 개까지 보일지 선택합니다, 높게 설정하면 메모리 사용량이 증가할 수 있습니다',
       default: 50,
+      step: 10,
       min: 1,
       max: 1000
     },
@@ -388,6 +393,13 @@ export default class Config {
       console.warn(`Storage ${key} mismatched, set to default (${value} !== ${defaultValue})`)
       this.set(key, defaultValue)
       return defaultValue
+    }
+    
+    // 자료형이 숫자라면 최소, 최대 제한하기
+    if (typeof value === 'number') {
+      const min = this.getOption<number>(key, 'min')
+      const max = this.getOption<number>(key, 'max')
+      return range(value, min, max)
     }
 
     return value
