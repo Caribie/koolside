@@ -37,7 +37,11 @@ class Cache extends Array<CacheSet> {
    * @param id 갤러리 아이디
    * @param post 게시글 번호
    */
-  indexOfElement (id: string, post: number) {
+  indexOfElement (id: string, post: number|string) {
+    if (typeof post === 'string') {
+      post = parseInt(post, 10)
+    }
+
     for (let i = 0; i < this.length; i++) {
       const item = this[i]
       if (item.id === id && item.post === post) {
@@ -53,7 +57,7 @@ class Cache extends Array<CacheSet> {
    * @param id 갤러리 아이디
    * @param post 게시글 번호
    */
-  has (id: string, post: number | string) {
+  has (id: string, post: number|string) {
     if (typeof post === 'string') {
       post = parseInt(post, 10)
     }
@@ -66,7 +70,7 @@ class Cache extends Array<CacheSet> {
    * @param id 갤러리 아이디
    * @param post 게시글 번호
    */
-  get (id: string, post: number | string) {
+  get (id: string, post: number|string) {
     if (typeof post === 'string') {
       post = parseInt(post, 10)
     }
@@ -86,7 +90,7 @@ class Cache extends Array<CacheSet> {
    * @param post 게시글 번호
    * @param element HTMLElement 객체
    */
-  set (id: string, post: number | string, element: HTMLElement) {
+  set (id: string, post: number|string, element: HTMLElement) {
     if (typeof post === 'string') {
       post = parseInt(post, 10)
     }

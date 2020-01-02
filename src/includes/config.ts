@@ -4,13 +4,21 @@ import dotProp from 'dot-prop'
 
 import componentConfig from '../components/config'
 import componentStyle from '../components/style'
-import { createElement,formatFont, range } from './utils'
+import { createElement, range } from './utils'
 
-let notificationRules: RegExp[]
+const notifyRules = {} as LooseObject<RegExp[]>
+
+function parseRegex (value: string) {
+  return value.split('\n').filter(v => v.trim() && !v.startsWith('#')).map(v => new RegExp(v))
+}
+
+function formatFont (fonts: string) {
+  return fonts.split('\n').map(font => `"${font}"`).join(', ')
+}
 
 export const configuration = {} as LooseObject<ConfigRecursive>
 
-// 게시판 관련 설정
+// 실시간 게시판
 configuration.live = {
   name: '실시간 게시판',
   items: {
@@ -60,34 +68,56 @@ configuration.live = {
       max: 1000
     },
     notification: {
-      name: '푸시 알림 활성화',
-      description: '제목, 내용이 규칙과 일치하면 브라우저 알림을 울립니다',
-      default: true
-    },
-    notification_rules: {
-      name: '푸시 알림 규칙',
-      description: '정규표현식으로 한 줄에 한 규칙 씩 들어갑니다, 많이 추가하면 메모리 사용량이 증가할 수 있습니다',
-      default: '',
-      textarea: true,
-      placeholder: '\\w망호',
-      format: () => notificationRules,
-      onUpdate (_, value: string) {
-        notificationRules = []
-
-        if (!value) {
-          return
-        }
-
-        for (let rule of value.split(/\n/g)) {
-          if (rule.trim()) {
-            notificationRules.push(new RegExp(rule))
-          } 
-        }
+      name: '푸시 알림',
+      description: '새 게시글의 제목과 내용 등이 정규표현식과 일치하면 브라우저 알림을 울립니다',
+      items: {
+        enabled: {
+          name: '활성화',
+          description: '푸시 알림을 활성화합니다',
+          default: true
+        },
+        title: {
+          name: '제목',
+          description: '정규표현식은 한 줄에 한 규칙씩 인식합니다, 맨 앞 글자가 해시(#)라면 주석으로 처리됩니다.',
+          default: '',
+          placeholder: '([글롤히]망호)',
+          textarea: true,
+          format: () => notifyRules.title,
+          onUpdate: (_, v: string) => notifyRules.title = parseRegex(v)
+        },
+        content: {
+          name: '내용',
+          description: '정규표현식은 한 줄에 한 규칙씩 인식합니다, 맨 앞 글자가 해시(#)라면 주석으로 처리됩니다.',
+          default: '',
+          placeholder: '<img src=".+">',
+          textarea: true,
+          format: () => notifyRules.content,
+          onUpdate: (_, v: string) => notifyRules.content = parseRegex(v)
+        },
+        nickname: {
+          name: '작성자 닉네임',
+          description: '정규표현식은 한 줄에 한 규칙씩 인식합니다, 맨 앞 글자가 해시(#)라면 주석으로 처리됩니다.',
+          default: '',
+          placeholder: '실 성',
+          textarea: true,
+          format: () => notifyRules.nickname,
+          onUpdate: (_, v: string) => notifyRules.nickname = parseRegex(v)
+        },
+        username: {
+          name: '작성자 아이디 또는 아이피',
+          description: '정규표현식은 한 줄에 한 규칙씩 인식합니다, 맨 앞 글자가 해시(#)라면 주석으로 처리됩니다.',
+          default: '',
+          placeholder: 'carson\n127\\.0',
+          textarea: true,
+          format: () => notifyRules.username,
+          onUpdate: (_, v: string) => notifyRules.username = parseRegex(v)
+        },
       }
-    }
+    },
   }
 }
 
+// 미리보기
 configuration.preview = {
   name: '미리보기',
   items: {

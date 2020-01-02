@@ -76,14 +76,6 @@ export function hasAdminPermission () {
 }
 
 /**
- * 글꼴 목록을 스타일시트 문법에 맞게 변환 후 반환합니다
- * @param fonts 글꼴 값
- */
-export function formatFont (fonts: string) {
-  return fonts.split('\n').map(font => `"${font}"`).join(', ')
-}
-
-/**
  * 특정 값이 최소 또는 최대 값을 벗어나는지 확인하고 벗어나면 최소, 최대 값을 반환합니다
  * @param value 값
  * @param min 최소 값

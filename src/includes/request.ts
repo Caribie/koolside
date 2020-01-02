@@ -45,10 +45,10 @@ export default function request (opts: string | GM_RequestInfo) {
  * @param post 게시글 번호
  */
 export async function fetchPost (gallery: string, post: number | string) {
-  const element = document.querySelector(`tr[data-no="${post}"]`)
+  const el = document.querySelector<HTMLElement>(`tr[data-no="${post}"]`)
 
   // 미리보기 대기 중 클래스 추가하기
-  element?.classList.add('ks-loading')
+  el?.classList.add('ks-loading')
 
   const res = await request({
     url: `https://m.dcinside.com/board/${gallery}/${post}`,
@@ -104,21 +104,39 @@ export async function fetchPost (gallery: string, post: number | string) {
   content.innerHTML = content.innerHTML.replace(/(<br(\s+\/)?>\s{0,}){2,}/g, '<br>')
 
   // 푸시 알림 울리기 위해 일치하는지 확인하기
-  const notifiaction = Config.get('live.notification')
-  const rules = Config.get('live.notification_rules')
+  const notifiaction = Config.get('live.notification.enabled')
 
-  if (notifiaction && rules) {
-    const title = element.querySelector('.gall_tit').textContent
-    const text = `${title}\n${content.innerHTML}`
-    
-    for (let rule of rules) {
-      if (text.match(rule)) {
-        Push.create(title, {
-          body: content.textContent,
-          link: `https://gall.dcinside.com/board/view/?id=${gallery}&no=${post}`
-        })
-        break
+  if (el && notifiaction) {
+    const title = el.querySelector('.gall_tit').textContent
+    const items = [
+      [ Config.get('live.notification.title'), title ],
+      [ Config.get('live.notification.content'), content.innerHTML ],
+      [ Config.get('live.notification.nickname'), el.dataset.nickname ],
+      [ Config.get('live.notification.username'), el.dataset.username ]
+    ] as [ RegExp[], string ][]
+
+    let matches
+
+    // 규칙 일치하는지 확인하기
+    while (items.length && !matches) {
+      const [rules, text] = items.shift()
+
+      while (rules.length) {
+        matches = text.match(rules.shift())
+
+        if (matches) {
+          break
+        }
       }
+    }
+
+    if (matches) {
+      console.log(matches)
+
+      Push.create(title, {
+        body: content.textContent,
+        link: `https://gall.dcinside.com/board/view/?id=${gallery}&no=${post}`
+      })
     }
   }
 
@@ -126,7 +144,7 @@ export async function fetchPost (gallery: string, post: number | string) {
   cache.set(gallery, post, content)
 
   // 미리보기 대기 중 클래스 삭제하기
-  element?.classList.remove('ks-loading')
+  el?.classList.remove('ks-loading')
   
   return content
 }
@@ -193,8 +211,14 @@ export async function fetchList (gallery: string) {
     // 데이터 셋에 글 번호 붙이기
     const fetchedString = fetchedPost.querySelector('.gall_num').textContent
     const fetched = parseInt(fetchedString, 10)
+
     fetchedPost.dataset.no = fetchedString
     fetchedPosts.push(fetched)
+
+    // 데이터 셋에 작성자 정보 붙이기
+    const writer = fetchedPost.querySelector<HTMLElement>('.gall_writer')
+    fetchedPost.dataset.nickname = writer.dataset.nick
+    fetchedPost.dataset.username = writer.dataset.uid || writer.dataset.ip
 
     // 기존 게시글 요소 불러오기
     const post = table.querySelector(`[data-no="${fetched}"]`)

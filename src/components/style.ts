@@ -197,6 +197,7 @@ const template =  /* less */`
     }
   }
 
+  /* 설정 */
   #ks-config {
     transition: opacity @animation-speed;
     z-index: 1000;
@@ -250,37 +251,31 @@ const template =  /* less */`
       }
     }
 
-    .ks-config-key {
-      display: block;
-      width: 100%;
+    .ks-config-item {
+      display: flex;
+      cursor: pointer;
 
-      label {
-        float: left;
-        display: inline-block;
-        width: 50%;
-        cursor: pointer;
+      > div {
+        flex: 1;
       }
 
-      > input, textarea {
-        float: right;
-        display: inline-block;
+      input, textarea {
+        width: 100%;
         margin: 0;
-        width: 50%;
         border: 0;
         box-sizing: border-box;
         background: lighten(@color-primary, 5%);
         font-family: @font-monospace;
-      }
-      > textarea {
-        min-height: 100px;
-        resize: vertical;
+        cursor: pointer;
 
         &::placeholder {
           color: darken(@color-primary, 5%);
         }
       }
-
-      .ks-clearfix();
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
     }
 
     .ks-config-buttons {
@@ -303,6 +298,7 @@ const template =  /* less */`
     }
   }
 
+  /* 미리보기 */
   #ks-preview {
     transition: opacity @animation-speed;
     transform-origin: top left; 
@@ -312,7 +308,7 @@ const template =  /* less */`
     left: 0;
     overflow: hidden;
     overflow-y: auto;
-    display: inline-block;
+    display: flex;
     visibility: hidden;
     padding: 1em;
     max-width: 500px;
@@ -324,15 +320,23 @@ const template =  /* less */`
     font-size: {font_size_preview};
     line-height: {font_size_preview};
     color: white;
+    
+    .ks-preview-post {
+      img {
+        max-width: 200px;
+        max-height: 200px;
+        cursor: pointer;
 
-    img {
-      max-width: 100%;
-      max-height: 200px;
-      cursor: pointer;
-
-      &.ks-active {
-        max-height: 100%;
+        &.ks-active {
+          max-width: 100%;
+          max-height: 100%;
+        }
       }
+    }
+
+    .ks-preview-comment {
+      flex: 1;
+      max-width: 50%;
     }
 
     &.ks-active {

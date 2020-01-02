@@ -4,6 +4,11 @@ import cache from '../includes/cache'
 import Config, { configuration } from '../includes/config'
 import { createElement } from '../includes/utils'
 
+/**
+ * 설정 아이템 요소를 생성합니다
+ * @param items 설정 아이템
+ * @param prop 현재까지 사용한 프롭 문자열
+ */
 function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: string) {
   const result = [] as string[]
   
@@ -14,7 +19,7 @@ function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: strin
     key = `${prop}${key}`
 
     if ('items' in item) {
-      // 카테고리라면 헤더와 하위 아이템 추가하기
+      // 헤더와 하위 아이템 추가하기
       result.push(/* html */`
         <details style="padding-left:1em">
           <summary title=${item.description ?? item.name}>${item.name}</summary>
@@ -23,59 +28,40 @@ function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: strin
       `)
     } else {
       // 아이템 추가하기
-      const value = Config.getRaw(key)
-      let html = ''
+      let input
+      let value = Config.getRaw(key)
 
       // 자료형에 따라 태그 설정하기
       if (typeof value === 'string') {
         const textarea = (item as ConfigString).textarea
-        const placeholder = (item as ConfigString).placeholder
+        const placeholder = ((item as ConfigString).placeholder ?? '').replace(/"/g, '&quot;')
+  
+        value = value.replace(/"/g, '&quot;')
 
         if (textarea) {
-          html = /* html */`
-            <label>${item.name}</label>
-            <textarea 
-              placeholder="${placeholder}"
-              data-key="${key}">${value.replace(/"/g, '&quot;')}</textarea>
-          `
+          input = `<textarea placeholder="${placeholder}">${value}</textarea>`
         } else {
-          html = /* html */`
-            <label>${item.name}</label>
-            <input 
-              type="text"
-              value="${value.replace(/"/g, '&quot;')}"
-              placeholder="${placeholder}"
-              data-key="${key}">
-          `
+          input = `<input type="text" value="${value}" placeholder="${placeholder}">`
         }
       } else if (typeof value === 'number') {
-        const step = (item as ConfigNumber).step
         const min = (item as ConfigNumber).min
         const max = (item as ConfigNumber).max
+        const step = (item as ConfigNumber).step
+        const type = step ? 'range' : 'number'
 
-        if (step) {
-          html = /* html */`
-            <label>${item.name}</label>
-            <input type="range" value="${value}" min="${min}" max="${max}" step="${step}" data-tooltip="${value}" data-key="${key}">
-          `
-        } else {
-          html = /* html */`
-            <label>${item.name}</label>
-            <input type="number" value="${value}" min="${min}" max="${max}" step="${step}">
-          `
-        }
+        input = `<input type="${type}" value="${value}" min="${min}" max="${max}" step="${step}">`
       } else if (typeof value === 'boolean') {
-        html = /* html */`
-          <label>
-            <input type="checkbox" data-key="${key}" ${!value || 'checked'}>
-            <span>${item.name}</span>
-          </label>
-        `
+        input = `<input type="checkbox" ${!value || 'checked'}>`
       } else {
         console.error(`'${key}' 설정을 처리할 수 없습니다`)
       }
 
-      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description ?? item.name}">${html}</div>`)
+      result.push(`
+        <div class="ks-config-item" data-key="${key}" data-tooltip="${item.description ?? item.name}">
+          <div class="ks-config-key">${item.name}</div>
+          <div class="ks-config-value">${input}</div>
+        </div>
+      `)
     }
   }
 
@@ -83,7 +69,9 @@ function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: strin
 }
 
 function update (this: HTMLInputElement) {
-  const key = this.dataset.key
+  const wrapper = this.closest<HTMLElement>('.ks-config-item')
+
+  const key = wrapper.dataset.key
   const type = typeof Config.getDefaultValue(key)
 
   let value
@@ -109,7 +97,7 @@ function update (this: HTMLInputElement) {
 
 const componentConfig: Component = {
   create () {
-    document.body.prepend(createElement(/* html */`
+    document.body.prepend(createElement(`
       <div id="ks-config">
         <div>
           <div class="ks-config-items">${generate().join('')}</div>
@@ -123,18 +111,29 @@ const componentConfig: Component = {
       </div>
     `))
 
-    const wrapper = document.querySelector('#ks-config')
+    const component = document.querySelector('#ks-config')
 
     // 설정 화면 닫기 이벤트
-    wrapper.addEventListener('click', e => {
+    component.addEventListener('click', e => {
       const target = e.target as HTMLElement
-      if (target.id === 'ks-config') {
+  
+      if (target.matches('#ks-config')) {
         target.classList?.toggle('ks-active')
       }
     })
 
+    // 작은거 누르기 싫어하는 사람을 위한 체크박스 보조 이벤트
+    for (let checkbox of component.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')) {
+      const wrapper = checkbox.closest<HTMLElement>('.ks-config-item')
+
+      wrapper.addEventListener('click', e => {
+        // 체크박스 클릭하면 이벤트 두 개 들어가서 값 복구되는거 방지하기
+        if (e.target !== checkbox) checkbox.checked = !checkbox.checked
+      })
+    }
+
     // 설정 값 변경 이벤트
-    for (let input of wrapper.querySelectorAll('input, textarea') as NodeListOf<HTMLInputElement>) {
+    for (let input of component.querySelectorAll<HTMLInputElement>('input, textarea')) {
       input.addEventListener('change', update)
 
       if (input.getAttribute('type') === 'range') {
@@ -142,19 +141,19 @@ const componentConfig: Component = {
       }
     }
 
-    wrapper.querySelector('#ks-btn-reset').addEventListener('click', () => {
+    component.querySelector('#ks-btn-reset').addEventListener('click', () => {
       if (confirm('정말로 설정을 처음으로 되돌리시겠습니까?')) {
         Config.load({})
       }
     })
 
-    wrapper.querySelector('#ks-btn-resetcache').addEventListener('click', () => {
+    component.querySelector('#ks-btn-resetcache').addEventListener('click', () => {
       if (confirm(`정말로 캐시된 게시글 ${cache.length}개를 삭제하시겠습니까?`)) {
         cache.reset()
       }
     })
 
-    wrapper.querySelector('#ks-btn-export').addEventListener('click', () => {
+    component.querySelector('#ks-btn-export').addEventListener('click', () => {
       const filename = `koolside-${+new Date()}.json`
       const file = new File([JSON.stringify(Config.export())], filename, {
         type: 'application/json;charset=utf-8'
@@ -163,7 +162,7 @@ const componentConfig: Component = {
       FileSaver.saveAs(file)
     })
 
-    wrapper.querySelector('#ks-btn-import').addEventListener('click', () => {
+    component.querySelector('#ks-btn-import').addEventListener('click', () => {
       const data = prompt('가져올 설정 JSON 데이터를 입력해주세요')
 
       // 사용자가 취소했다면 끝내기

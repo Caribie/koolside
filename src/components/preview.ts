@@ -9,6 +9,8 @@ function onMouseEvent (e: MouseEvent) {
   const body = document.body
 
   const preview = document.querySelector<HTMLElement>('#ks-preview')
+  const previewPost = preview.querySelector('.ks-preview-post')
+  const previewComment = preview.querySelector('.ks-preview-comment')
   const context = document.querySelector('#ks-contextmenu')
 
   if (!preview || !Config.get('preview.enabled')) {
@@ -26,11 +28,12 @@ function onMouseEvent (e: MouseEvent) {
     return
   }
 
-  // 커서가 미리보기 객체 위에 있다면 미리보기 박스 내에서 스크롤 해야하므로 무시하기
   if (target.closest('#ks-preview')) {
+    // 커서가 미리보기 안에 있음
     body.classList.add('ks-prevent-scrolling')
     return
   } else {
+    // 커서가 미리보기 밖에 있음
     body.classList.remove('ks-prevent-scrolling')
   }
 
@@ -43,8 +46,9 @@ function onMouseEvent (e: MouseEvent) {
     // 현재 미리보기로 선택한 게시글이 아니고 캐시가 있다면 업데이트하기
     if (current !== number && cache.has(gallery, number)) {
       preview.dataset.no = `${number}`
-      preview.innerHTML = cache.get(gallery, number) as string
       preview.classList.add('ks-active')
+
+      previewPost.innerHTML = cache.get(gallery, number) as string
 
       for (let img of preview.querySelectorAll('img')) {
         img.addEventListener('click', function () {
@@ -57,20 +61,29 @@ function onMouseEvent (e: MouseEvent) {
       const previewRect = preview.getBoundingClientRect()
       const postRect = post.getBoundingClientRect()
 
-      const top = scrollTop + (postRect.top + postRect.height / 2) - (previewRect.height / 2)
+      const yBase = scrollTop + (postRect.top + postRect.height / 2) - (previewRect.height / 2)
       
       const xOffset = Config.get<number>('preview.offset')
       const yOffset = 
-        Math.min(0, top - scrollTop) + // Top
-        Math.max(0, (top + previewRect.height) - (scrollTop + body.clientHeight)) // Bottom
+        Math.min(0, yBase - scrollTop) + // Top
+        Math.max(0, (yBase + previewRect.height) - (scrollTop + body.clientHeight)) // Bottom
 
-      preview.style.top = `${top - yOffset}px`
-      preview.style.left = `${e.pageX + xOffset}px`
+      let left = e.pageX
+
+      if (xOffset > 0) {
+        left += xOffset
+      } else {
+        left += xOffset - previewRect.width
+      }
+
+      preview.style.top = `${yBase - yOffset}px`
+      preview.style.left = `${left}px`
     }
   } else {
     // 프리뷰 박스 초기화
+    previewPost.innerHTML = ''
+    previewComment.innerHTML = ''
     preview.classList.remove('ks-active')
-    preview.innerHTML = ''
     delete preview.dataset.no
   }
 }
@@ -82,7 +95,12 @@ const componentPreview: Component = {
       return
     }
 
-    document.body.prepend(createElement('<div id="ks-preview"></div>'))
+    document.body.prepend(createElement(`
+      <div id="ks-preview">
+        <div class="ks-preview-post"></div>
+        <div class="ks-preview-comment">Hello</div>
+      </div>
+    `))
     document.addEventListener('mousemove', onMouseEvent)
     document.addEventListener('contextmenu', onMouseEvent)
   },
