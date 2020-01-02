@@ -23,10 +23,13 @@ if (window.top === window.self) {
   
     // 기존 게시글 목록 데이터 셋 초기화하기
     for (let post of document.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
-      // 게시글 번호
-      if (!post.dataset.no) {
-        post.dataset.no = post.querySelector('.gall_num').textContent.trim() || getParameter('no')
-      }
+      // 데이터 셋에 글 번호 붙이기
+      post.dataset.no = post.querySelector('.gall_num').textContent.trim()
+
+      // 데이터 셋에 작성자 정보 붙이기
+      const writer = post.querySelector<HTMLElement>('.gall_writer')
+      post.dataset.nickname = writer.dataset.nick
+      post.dataset.username = writer.dataset.uid || writer.dataset.ip
   
       // 광고
       if (!post.dataset.notice && post.querySelector('.icon_notice, .icon_survey')) {
