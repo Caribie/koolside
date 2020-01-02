@@ -4,12 +4,7 @@ const { stripIndent } = require('common-tags')
 const package = require('./package.json')
 
 module.exports = (env, argv) => {
-  const sans = argv.mode !== 'production' // is sans enabled? if it say WAHHHHH!!
-
-  const mode = sans ? 'development' : 'production'
-  const devtool = sans ? 'eval-source-map' : ''
-  const filename = sans ? 'debug.user.js' : 'koolside.user.js'
-
+  const sans = argv.mode !== 'production' // 와 샌즈
   const metadata = stripIndent`
   // ==UserScript==
   // @name          koolside
@@ -32,10 +27,9 @@ module.exports = (env, argv) => {
   /**/
   `
     
-  return {
+  const options = {
     entry: './src/index.ts',
-    devtool,
-    mode,
+    mode: sans ? 'development' : 'production',
     module: {
       rules: [
         {
@@ -50,7 +44,7 @@ module.exports = (env, argv) => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename
+      filename: sans ? 'debug.user.js' : 'koolside.user.js',
     },
     plugins: [
       // BannerPlugin 은 최적화 후에 추가되서 다른 걸로 대체
@@ -63,4 +57,10 @@ module.exports = (env, argv) => {
       topLevelAwait: true
     }
   }
+
+  if (sans) {
+    options.devtool = 'eval-source-map'
+  }
+
+  return options
 }
