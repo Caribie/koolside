@@ -94,8 +94,8 @@ function onContextMenu (e: MouseEvent) {
   if (post || target.hasAttribute('href') || target.hasAttribute('src')) {
     const url = 
       target.getAttribute('href') // 일반 주소
-      || target.getAttribute('src') // 이미지 주소
-      || `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
+      ?? target.getAttribute('src') // 이미지 주소
+      ?? `https://gall.dcinside.com/board/view/?id=${gallery}&no=${number}`
 
     items.push({
       name: '새 탭에서 열기',
@@ -160,7 +160,7 @@ function onContextMenu (e: MouseEvent) {
 
     const writer = post.querySelector<HTMLElement>('.gall_writer')
     const author = writer.dataset.nick
-    const authorId = writer.dataset.uid || writer.dataset.ip
+    const authorId = writer.dataset.uid ?? writer.dataset.ip
 
     items.push({
       name: '작성자 정보 복사',

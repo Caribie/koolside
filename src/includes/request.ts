@@ -20,7 +20,7 @@ const checkboxTemplate = createElement(/* html */`
 export default function request (opts: string | GM_RequestInfo) {
   const options = typeof opts === 'string' ? { url: opts } : opts
 
-  options.method = options.method || 'GET'
+  options.method = options.method ?? 'GET'
 
   return new Promise<GM_Response>((resolve, reject) => {
     GM_xmlhttpRequest({
@@ -91,7 +91,7 @@ export async function fetchPost (gallery: string, post: number | string) {
 
   // 모든 이미지 원본 주소로 변환하기
   for (let img of content.querySelectorAll('img')) {
-    const src = img.dataset.original || img.src
+    const src = img.dataset.original ?? img.src
 
     while (img.attributes.length) {
       img.removeAttribute(img.attributes[0].name)

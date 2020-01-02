@@ -7,14 +7,14 @@ import { createElement } from '../includes/utils'
 function generateItems (set: ConfigSet, keys?: string) {
   const result = [] as string[]
   
-  keys = keys || ''
+  keys = keys ?? ''
 
   for (let k in set) {
     const item = set[k]
 
     if ('set' in item) {
       // 카테고리라면 헤더와 하위 아이템 추가하기
-      const i = 2 + (keys.match(/\./g) || []).length // 헤더 번호 (<h1>, <h2>, <h3>...)
+      const i = 2 + (keys.match(/\./g) ?? []).length // 헤더 번호 (<h1>, <h2>, <h3>...)
 
       result.push(/* html */`
         <details style="padding-left:${i/2}em">
@@ -31,7 +31,7 @@ function generateItems (set: ConfigSet, keys?: string) {
 
       // 자료형에 따라 태그 설정하기
       if (typeof value === 'string') {
-        const placeholder = Config.getOption(key, 'placeholder') || '' 
+        const placeholder = Config.getOption(key, 'placeholder') ?? '' 
 
         if (Config.getOption(key, 'textarea')) {
           html = /* html */`
@@ -51,9 +51,9 @@ function generateItems (set: ConfigSet, keys?: string) {
           `
         }
       } else if (typeof value === 'number') {
-        const min = Config.getOption<number>(key, 'min') || ''
-        const max = Config.getOption<number>(key, 'max') || ''
-        const step = Config.getOption<number>(key, 'step') || ''
+        const min = Config.getOption<number>(key, 'min') ?? ''
+        const max = Config.getOption<number>(key, 'max') ?? ''
+        const step = Config.getOption<number>(key, 'step') ?? ''
 
         if (step) {
           html = /* html */`
@@ -85,7 +85,7 @@ function generateItems (set: ConfigSet, keys?: string) {
         item.onChange(null, Config.getRaw(key))
       }
 
-      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description || item.name}">${html}</div>`)
+      result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description ?? item.name}">${html}</div>`)
     }
   }
 

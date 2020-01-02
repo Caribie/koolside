@@ -25,13 +25,13 @@ if (window.top === window.self) {
   componentConfig.create()
   
   if (document.querySelector('.gall_list')) {
-    // 기존 게시글 목록 데이터 셋 초기화하기
     const fetching = []
   
+    // 기존 게시글 목록 데이터 셋 초기화하기
     for (let post of document.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
       // 게시글 번호
       if (!post.dataset.no) {
-        post.dataset.no = post.querySelector('.gall_num').textContent.trim() || getParameter('no')
+        post.dataset.no = post.querySelector('.gall_num').textContent.trim() ?? getParameter('no')
       }
   
       // 광고
