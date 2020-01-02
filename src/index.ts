@@ -1,6 +1,5 @@
-import componentConfig from './components/config'
 import componentContext from './components/context'
-import componentStyle from './components/style'
+import componentPreview from './components/preview'
 import componentTooltip from './components/tooltip'
 import cache from './includes/cache'
 import Config from './includes/config'
@@ -8,21 +7,18 @@ import { fetchList, fetchPosts } from './includes/request'
 import { getParameter, promiseSeries, wait } from './includes/utils'
 
 // @ts-ignore FUCK YOU VSCODE
-await new Promise(resolve => window.onload = resolve)
+await new Promise(resolve => window.addEventListener('load', resolve))
 
 if (window.top === window.self) {
-  const gallery = getParameter('id')
-  
-  // 설정 맞추기
-  Config.sync()
+  Config.load()
   
   // 앱에서 사용할 요소와 스타일 시트 추가하기
-  componentStyle.create()
-  componentTooltip.create()
   componentContext.create()
-  componentConfig.create()
+  componentTooltip.create()
+  componentPreview.create()
   
   if (document.querySelector('.gall_list')) {
+    const gallery = getParameter('id')
     const fetching = []
   
     // 기존 게시글 목록 데이터 셋 초기화하기
@@ -33,7 +29,7 @@ if (window.top === window.self) {
       }
   
       // 광고
-      if (!post.dataset.notice && post.querySelector('.icon_notice')) {
+      if (!post.dataset.notice && post.querySelector('.icon_notice, .icon_survey')) {
         post.dataset.notice = ''
       } else if (!cache.has(gallery, post.dataset.no)) {
         // 캐시가 없다면 캐시할 게시글 목록에 추가하기

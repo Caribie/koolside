@@ -1,39 +1,37 @@
 import FileSaver from 'file-saver'
 
 import cache from '../includes/cache'
-import Config, { set } from '../includes/config'
+import Config, { configuration } from '../includes/config'
 import { createElement } from '../includes/utils'
 
-function generateItems (set: ConfigSet, keys?: string) {
+function generate (items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: string) {
   const result = [] as string[]
   
-  keys = keys ?? ''
+  items = items ?? configuration
+  prop = prop ?? ''
 
-  for (let k in set) {
-    const item = set[k]
+  for (let [key, item] of Object.entries(items)) {
+    key = `${prop}${key}`
 
-    if ('set' in item) {
+    if ('items' in item) {
       // 카테고리라면 헤더와 하위 아이템 추가하기
-      const i = 2 + (keys.match(/\./g) ?? []).length // 헤더 번호 (<h1>, <h2>, <h3>...)
-
       result.push(/* html */`
-        <details style="padding-left:${i/2}em">
-          <summary>${item.name}</summary>
-          ${generateItems(item.set, `${keys}${k}.`).join('\n')}
+        <details style="padding-left:1em">
+          <summary title=${item.description ?? item.name}>${item.name}</summary>
+          ${generate(item.items, `${key}.`).join('')}
         </details>
       `)
     } else {
       // 아이템 추가하기
-      const key = `${keys}${k}`
       const value = Config.getRaw(key)
-
       let html = ''
 
       // 자료형에 따라 태그 설정하기
       if (typeof value === 'string') {
-        const placeholder = Config.getOption(key, 'placeholder') ?? '' 
+        const textarea = (item as ConfigString).textarea
+        const placeholder = (item as ConfigString).placeholder
 
-        if (Config.getOption(key, 'textarea')) {
+        if (textarea) {
           html = /* html */`
             <label>${item.name}</label>
             <textarea 
@@ -51,9 +49,9 @@ function generateItems (set: ConfigSet, keys?: string) {
           `
         }
       } else if (typeof value === 'number') {
-        const min = Config.getOption<number>(key, 'min') ?? ''
-        const max = Config.getOption<number>(key, 'max') ?? ''
-        const step = Config.getOption<number>(key, 'step') ?? ''
+        const step = (item as ConfigNumber).step
+        const min = (item as ConfigNumber).min
+        const max = (item as ConfigNumber).max
 
         if (step) {
           html = /* html */`
@@ -69,20 +67,12 @@ function generateItems (set: ConfigSet, keys?: string) {
       } else if (typeof value === 'boolean') {
         html = /* html */`
           <label>
-            <input
-              type="checkbox" 
-              data-key="${key}"
-              ${value ? 'checked' : ''}>
+            <input type="checkbox" data-key="${key}" ${!value || 'checked'}>
             <span>${item.name}</span>
           </label>
         `
       } else {
         console.error(`'${key}' 설정을 처리할 수 없습니다`)
-      }
-
-      // 변경 시 실행될 값이 있다면 초기화를 위해 실행하기
-      if (item.onChange) {
-        item.onChange(null, Config.getRaw(key))
       }
 
       result.push(`<div class="ks-config-item ks-config-key" data-tooltip="${item.description ?? item.name}">${html}</div>`)
@@ -119,10 +109,10 @@ function update (this: HTMLInputElement) {
 
 const componentConfig: Component = {
   create () {
-    const component = createElement(/* html */`
+    document.body.prepend(createElement(/* html */`
       <div id="ks-config">
         <div>
-          ${generateItems(set).join('\n')}
+          <div class="ks-config-items">${generate().join('')}</div>
           <div class="ks-config-buttons">
             <button id="ks-btn-reset">설정 초기화</button>
             <button id="ks-btn-resetcache">캐시 초기화</button>
@@ -131,9 +121,7 @@ const componentConfig: Component = {
           </div>
         </div>
       </div>
-    `)
-
-    document.body.prepend(component)
+    `))
 
     const wrapper = document.querySelector('#ks-config')
 
@@ -156,11 +144,7 @@ const componentConfig: Component = {
 
     wrapper.querySelector('#ks-btn-reset').addEventListener('click', () => {
       if (confirm('정말로 설정을 처음으로 되돌리시겠습니까?')) {
-        Config.reset()
-
-        if (confirm('새 설정을 적용하기 위해선 페이지를 다시 불러와야합니다, 새로 고치시겠습니까?')) {
-          location.reload()
-        }
+        Config.load({})
       }
     })
 
@@ -193,10 +177,6 @@ const componentConfig: Component = {
         console.error(e)
         alert('JSON 데이터가 잘못됐습니다')
         return
-      }
-
-      if (confirm('새 설정을 적용하기 위해선 페이지를 다시 불러와야합니다, 새로 고치시겠습니까?')) {
-        location.reload()
       }
     })
   },

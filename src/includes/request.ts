@@ -181,7 +181,7 @@ export async function fetchList (gallery: string) {
   const $ = createElement(matches.groups.body).parentNode
 
   for (let fetchedPost of $.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
-    if (fetchedPost.querySelector('.icon_notice')) {
+    if (fetchedPost.querySelector('.icon_notice, .icon_survey')) {
       continue
     }
 

@@ -1,17 +1,17 @@
 import dotProp from 'dot-prop'
 
-import componentPreview from '../components/preview'
+import componentConfig from '../components/config'
 import componentStyle from '../components/style'
 import { createElement,formatFont } from './utils'
 
-export const set = {} as ConfigSet
-
 let notificationRules: RegExp[]
 
+export const configuration = {} as LooseObject<ConfigRecursive>
+
 // 게시판 관련 설정
-set.live = {
+configuration.live = {
   name: '실시간 게시판',
-  set: {
+  items: {
     enabled: {
       name: '활성화',
       description: '실시간 게시판 기능을 활성화합니다',
@@ -64,7 +64,7 @@ set.live = {
       textarea: true,
       placeholder: '\\w망호',
       format: () => notificationRules,
-      onChange (_, value: string) {
+      onUpdate (_, value: string) {
         notificationRules = []
 
         if (!value) {
@@ -81,20 +81,13 @@ set.live = {
   }
 }
 
-set.preview = {
+configuration.preview = {
   name: '미리보기',
-  set: {
+  items: {
     enabled: {
       name: '활성화',
       description: '미리보기 기능을 활성화합니다',
-      default: true,
-      onChange (_, value) {
-        componentPreview.destroy()
-
-        if (value) {
-          componentPreview.create()
-        }
-      }
+      default: true
     },
     offset: {
       name: '마우스 이격 거리',
@@ -107,10 +100,10 @@ set.preview = {
 }
 
 // 우 클릭 메뉴 설정
-set.context = {
+configuration.context = {
   name: '메뉴',
   description: '오른쪽 클릭 했을 때 출력되는 메뉴 관련 설정',
-  set: {
+  items: {
     disable_selectors: {
       name: '비활성화 요소',
       description: '특정 요소에서 메뉴를 비활성화합니다',
@@ -138,90 +131,92 @@ set.context = {
 }
 
 // 요소 숨기기 설정
-set.hide = {
+configuration.hide = {
   name: '요소',
   description: '페이지에서 숨길 요소를 선택합니다',
-  set: {
+  items: {
     ad: {
       name: '광고',
-      default: true
+      default: true,
+      class: 'ks-hide-ad'
     },
     logo: {
       name: '로고',
-      default: false
+      default: false,
+      class: 'ks-hide-logo'
     },
     gallery: {
       name: '갤러리',
-      set: {
+      items: {
         title: {
           name: '제목',
-          default: false
+          default: false,
+          class: 'ks-hide-title'
         },
         titlebar: {
           name: '정보',
-          default: false
+          default: false,
+          class: 'ks-hide-titlebar'
         },
         history: {
           name: '최근 방문 갤러리',
-          default: false
+          default: false,
+          class: 'ks-hide-history'
         },
         notice: {
           name: '공지 게시글',
           default: true,
-          onChange (value) {
-            const notices = document.querySelectorAll('.icon_notice')
-
-            for (let notice of notices) {
-              const post = notice.closest('tr')
-
-              if (value) {
-                post.classList.remove('ks-none')
-              } else {
-                post.classList.add('ks-none')
-              }
-            }
-          }
+          class: 'ks-hide-notice'
         }
       }
     },
     right: {
       name: '우측 사이드 바',
-      set: {
+      items: {
         all: {
           name: '전체',
-          default: false
+          default: false,
+          class: 'ks-hide-right'
         },
         login: {
           name: '사용자 정보',
-          default: false
+          default: false,
+          class: 'ks-hide-right-login'
         },
         recommend: {
           name: '개념글',
-          default: false
+          default: false,
+          class: 'ks-hide-right-recommend'
         },
         issuezoom: {
           name: '이슈 줌',
-          default: false
+          default: false,
+          class: 'ks-hide-right-issuezoom'
         },
         news: {
           name: '뉴스',
-          default: false
+          default: false,
+          class: 'ks-hide-right-news'
         },
         realtime: {
           name: '실시간 검색어',
-          default: false
+          default: false,
+          class: 'ks-hide-right-realtime'
         },
         hit: {
           name: '힛',
-          default: false
+          default: false,
+          class: 'ks-hide-right-hit'
         },
         sec_recommend: {
           name: '초개념',
-          default: false
+          default: false,
+          class: 'ks-hide-right-sec-recommend'
         },
         wiki: {
           name: '디시위키',
-          default: false
+          default: false,
+          class: 'ks-hide-right-wiki'
         }
       }
     }
@@ -229,9 +224,9 @@ set.hide = {
 }
 
 // 스타일시트 관련 설정
-set.style = {
+configuration.style = {
   name: '모양',
-  set: {
+  items: {
     animation_speed: {
       name: '애니메이션 속도 (밀리 초)',
       description: '애니메이션 속도를 지정합니다, 값이 0 이라면 비활성화합니다',
@@ -283,7 +278,7 @@ set.style = {
       default: '',
       textarea: true,
       placeholder: 'body {\n  background: red;\n}',
-      onChange (_, value) {
+      onUpdate (_, value) {
         document.querySelector('#ks-style-custom')?.remove()
 
         if (value.trim()) {
@@ -296,9 +291,9 @@ set.style = {
 }
 
 // 디버그 관련 설정
-set.debug = {
+configuration.debug = {
   name: '디버깅',
-  set: {
+  items: {
     less: {
       name :'Less',
       default: false
@@ -306,61 +301,51 @@ set.debug = {
   }
 }
 
-function defaultValues (set: ConfigSet) {
-  const result = {} as LooseObject
+function mapping (callback?: (k: string, v: ConfigTypes) => void, items?: LooseObject<ConfigRecursive|ConfigItem>, prop?: string) {
+  let props = {} as LooseObject<ConfigTypes>
+  
+  items = items ?? configuration
+  prop = prop ?? ''
 
-  for (let k in set) {
-    const config = set[k]
-    result[k] = 'set' in config ? defaultValues(config.set) : config.default
+  for (let [key, item] of Object.entries(items)) {
+    key = `${prop}${key}`
+
+    if ('items' in item) {
+      props = { ...props, ...mapping(callback, item.items, `${key}.`) }
+    } else {
+      props[key] = item as ConfigTypes
+    }
   }
 
-  return result
+  return props
 }
 
 export default class Config {
-  private static storage: LooseObject = GM_getValue('config', {})
-  private static defaultValues = defaultValues(set)
+  private static storage: LooseObject = {}
+  private static data = mapping()
 
-  /**
-   * 설정을 초기화합니다
-   */
-  static reset () {
-    GM_setValue('config', this.defaultValues)
+  /** 저장소에서 설정을 불러옵니다 */
+  static load (storage?: LooseObject) {
+    const entries = Object.entries(this.data)
 
-    this.storage = this.defaultValues
-  }
+    storage = storage ?? GM_getValue('config')
 
-  /**
-   * 런타임으로 돌아가는 설정을 저장소와 동기화합니다
-   */
-  static sync () {
-    GM_setValue('config', this.storage)
+    for (let [key, item] of entries) {
+      const value = dotProp.get<ConfigStorable>(storage, key, item.default)
+      this.set(key, value)
+    }
 
-    const classes = []
-
-    if (this.get('hide.ad')) classes.push('ks-hide-ad')
-    if (this.get('hide.logo')) classes.push('ks-hide-logo')
-
-    if (location.href.startsWith('https://gall.dcinside.com/')) {
-      if (this.get('hide.gallery.title')) classes.push('ks-hide-title')
-      if (this.get('hide.gallery.titlebar')) classes.push('ks-hide-titlebar')
-      if (this.get('hide.gallery.history')) classes.push('ks-hide-history')
-
-      if (this.get('hide.right.all')) {
-        classes.push('ks-hide-right')
-      } else {
-        if (this.get('hide.right.login')) classes.push('ks-hide-right-login')
-        if (this.get('hide.right.recommend')) classes.push('ks-hide-right-recommend')
-        if (this.get('hide.right.issuezoom')) classes.push('ks-hide-right-issuezoom')
-        if (this.get('hide.right.news')) classes.push('ks-hide-right-news')
-        if (this.get('hide.right.realtime')) classes.push('ks-hide-right-realtime')
-        if (this.get('hide.right.hit')) classes.push('ks-hide-right-hit')
-        if (this.get('hide.right.sec_recommend')) classes.push('ks-hide-right-sec-recommend')
-        if (this.get('hide.right.wiki')) classes.push('ks-hide-right-wiki')
+    for (let [key, item] of entries) {
+      if (item.onUpdate) {
+        item.onUpdate(null, this.getRaw(key))
       }
     }
 
-    document.body.setAttribute('class', classes.join(' '))
+    componentConfig.destroy()
+    componentConfig.create()
+
+    componentStyle.destroy()
+    componentStyle.create()
   }
 
   /**
@@ -369,24 +354,29 @@ export default class Config {
    * @param opt 옵션명
    */
   static getOption<T> (key: string, opt: string) {
-    return dotProp.get<T>(set, `${key.replace(/\./g, '.set.')}.${opt}`)
+    return dotProp.get<T>(this.data[key], opt)
   }
 
   /**
    * 설정 기본 값을 가져옵니다
    * @param key 키
    */
-  static getDefaultValue<T = Storable> (key: string) {
-    return dotProp.get<T>(this.defaultValues, key)
+  static getDefaultValue<T extends ConfigStorable> (key: string) {
+    return this.data[key].default as T
   }
 
   /**
    * 포맷 함수를 실행하지 않는 설정 값을 가져옵니다
    * @param key 키
+   * @param defaultValue 기본 값
    */
-  static getRaw<T = Storable> (key: string) {
+  static getRaw<T extends ConfigStorable> (key: string, defaultValue?: T) {
     const value = dotProp.get<T>(this.storage, key)
-    const defaultValue = this.getDefaultValue<T>(key)
+
+    // 함수 기본 값이 선언되지 않았을 때만 전역 기본 값 사용하기
+    if (typeof defaultValue === 'undefined') {
+      defaultValue = this.getDefaultValue<T>(key)
+    }
 
     // 값이 설정되지 않았다면 기본 값 반환하기
     if ([undefined, null].includes(value)) {
@@ -394,7 +384,7 @@ export default class Config {
     }
 
     // 기본 값과 자료형이 일치하지 않는다면 기본 값으로 설정하고 반환하기
-    if (typeof value !== typeof defaultValue) {
+    if (defaultValue && typeof value !== typeof defaultValue) {
       console.warn(`Storage ${key} mismatched, set to default (${value} !== ${defaultValue})`)
       this.set(key, defaultValue)
       return defaultValue
@@ -406,11 +396,11 @@ export default class Config {
   /**
    * 설정 값을 가져옵니다
    * @param key 키
+   * @param defaultValue 기본 값
    */
-  static get<T = Storable> (key: string) {
+  static get<T extends ConfigStorable> (key: string, defaultValue?: T) {
     const format = this.getOption<Function>(key, 'format')
-    const value = this.getRaw<T>(key)
-
+    const value = this.getRaw<T>(key, defaultValue)
     return format ? format(value) as T : value
   }
 
@@ -419,24 +409,33 @@ export default class Config {
    * @param key 키
    * @param value 값
    */
-  static set (key: string, value: Storable) {
-    // 변경 시 실행할 함수가 있다면 전후 변수 인자에 넣어 실행하기
-    const oldValue = this.getRaw(key)
+  static set (key: string, value: ConfigStorable) {
+    const old = this.getRaw(key)
 
-    if (oldValue !== value) {
-      console.log(`${key} changed ${oldValue} to ${value}`)
+    const onUpdate = this.getOption<Function>(key, 'onUpdate')
+    const className = this.getOption<string>(key, 'class')
 
-      const onChange = Config.getOption<Function>(key, 'onChange')
-      if (onChange) {
-        onChange(oldValue, value)
+    if (onUpdate) {
+      onUpdate(old, value)
+    }
+
+    if (className) {
+      if (value) {
+        document.body.classList.add(className)
+      } else {
+        document.body.classList.remove(className)
       }
     }
 
-    dotProp.set(this.storage, key, value)
-    this.sync()
+    // 값이 그대로라면 실행하지 않기
+    if (old === value) {
+      return
+    }
 
-    // 스타일 관련 설정이 변경됐다면 스타일시트 컴포턴트 새로 생성하기
-    if (key.startsWith('style')) {
+    dotProp.set(this.storage, key, value)
+    GM_setValue('config', this.storage)
+
+    if (key.startsWith('style.')) {
       componentStyle.destroy()
       componentStyle.create()
     }
@@ -454,7 +453,8 @@ export default class Config {
    * @param storage 새 설정 값
    */
   static import (storage: LooseObject) {
+    GM_setValue('config', storage)
     this.storage = storage
-    this.sync()
+    this.load(storage)
   }
 }

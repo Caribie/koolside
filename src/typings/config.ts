@@ -1,10 +1,12 @@
 
-interface ConfigItem {
+interface ConfigItem<T = ConfigStorable> {
   /** 이름 */
   name: string;
 
   /** 설명 */
   description?: string;
+
+  default: T;
 
   /** 값을 가져올 때 한번 거칠 함수 */
   // eslint-disable-next-line
@@ -12,17 +14,20 @@ interface ConfigItem {
 
   /** 값 수정 됐을 때 실행할 함수 */
   // eslint-disable-next-line
-  onChange? (oldValue: any, newValue: any): void;
+  onUpdate? (oldValue: any, newValue: any): void;
 }
 
-interface ConfigRecursive extends ConfigItem {
-  set: ConfigSet;
+interface ConfigRecursive {
+  /** 이름 */
+  name: string;
+
+  /** 설명 */
+  description?: string;
+
+  items: LooseObject<ConfigRecursive|ConfigTypes>;
 }
 
-interface ConfigString extends ConfigItem {
-  /** 기본 값 */
-  default: string;
-
+interface ConfigString extends ConfigItem<string> {
   /** 값이 없을 때 보여질 내용 */
   placeholder?: string;
 
@@ -30,10 +35,7 @@ interface ConfigString extends ConfigItem {
   textarea?: boolean;
 }
 
-interface ConfigNumber extends ConfigItem {
-  /** 기본 값 */
-  default: number;
-
+interface ConfigNumber extends ConfigItem<number> {
   /** 최소 값 */
   min?: number;
 
@@ -44,9 +46,10 @@ interface ConfigNumber extends ConfigItem {
   step?: number;
 }
 
-interface ConfigBoolean extends ConfigItem {
-  /** 기본 값 */
-  default: boolean;
+interface ConfigBoolean extends ConfigItem<boolean> {
+  /** 참일 시 body 에 추가될 클래스 명 */
+  class?: string;
 }
 
-type ConfigSet = LooseObject<ConfigRecursive | ConfigString | ConfigNumber | ConfigBoolean>
+type ConfigTypes = ConfigString | ConfigNumber | ConfigBoolean
+type ConfigStorable = string | number | boolean

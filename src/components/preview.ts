@@ -11,6 +11,10 @@ function onMouseEvent (e: MouseEvent) {
   const preview = document.querySelector<HTMLElement>('#ks-preview')
   const context = document.querySelector('#ks-contextmenu')
 
+  if (!preview || !Config.get('preview.enabled')) {
+    return
+  }
+
   // 텍스트 선택 중일 때는 미리보기 업데이트 안하기
   const selecting = e.buttons & 1 && window.getSelection().toString()
 
@@ -78,8 +82,7 @@ const componentPreview: Component = {
       return
     }
 
-    const preview = createElement('<div id="ks-preview"></div>')
-    document.body.prepend(preview)
+    document.body.prepend(createElement('<div id="ks-preview"></div>'))
     document.addEventListener('mousemove', onMouseEvent)
     document.addEventListener('contextmenu', onMouseEvent)
   },

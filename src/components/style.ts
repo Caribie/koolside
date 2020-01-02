@@ -24,9 +24,6 @@ const template =  /* less */`
       content: '';
     }
   }
-  .ks-none {
-    display: none;
-  }
 
   /* Reset */
   html, body {
@@ -74,6 +71,11 @@ const template =  /* less */`
         display: none;
       }
     }
+    &.ks-hide-notice {
+      [data-notice] {
+        display: none;
+      }
+    }
 
     &.ks-hide-right {
       .left_content {
@@ -81,6 +83,9 @@ const template =  /* less */`
         width: 100%;
       }
 
+      .stickyunit {
+        display: none;
+      }
       .issuebox {
         width: 100%;
       }
@@ -99,9 +104,6 @@ const template =  /* less */`
       }
     }
 
-    &.ks-hide-right .stickyunit {
-      display: none;
-    }
     &.ks-hide-right-login .login_box {
       display: none;
     }
