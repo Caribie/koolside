@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
   const sans = argv.mode !== 'production' // is sans enabled? if it say WAHHHHH!!
 
   const mode = sans ? 'development' : 'production'
-  const devtool = sans ? 'cheap-module-eval-source-map' : ''
+  const devtool = sans ? 'eval-source-map' : ''
   const filename = sans ? 'debug.user.js' : 'koolside.user.js'
 
   const metadata = stripIndent`
@@ -58,6 +58,9 @@ module.exports = (env, argv) => {
         header: metadata,
         afterOptimizations: true
       })
-    ]
+    ],
+    experiments: {
+      topLevelAwait: true
+    }
   }
 }

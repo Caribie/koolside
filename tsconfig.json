@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "lib": [
-      "ES2018",
+      "ES2019",
       "DOM",
       "DOM.Iterable"
     ],
-    "target": "ES2018",
-    "module": "CommonJS",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "jsx": "react-native",
     "outDir": "dist",

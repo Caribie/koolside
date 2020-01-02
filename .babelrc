@@ -10,6 +10,7 @@
         "regenerator": true
       }
     ],
+    "@babel/plugin-syntax-top-level-await",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-optional-chaining",
     "@babel/plugin-transform-named-capturing-groups-regex"

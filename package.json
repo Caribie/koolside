@@ -22,6 +22,7 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/plugin-proposal-optional-chaining": "^7.7.5",
+    "@babel/plugin-syntax-top-level-await": "^7.7.4",
     "@babel/plugin-transform-named-capturing-groups-regex": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
@@ -38,7 +39,7 @@
     "rimraf": "^3.0.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.4",
-    "webpack": "^4.41.5",
+    "webpack": "^5.0.0-beta.11",
     "webpack-cli": "^3.3.10",
     "wrapper-webpack-plugin": "^2.1.0"
   },

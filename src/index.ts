@@ -5,24 +5,29 @@ import componentTooltip from './components/tooltip'
 import cache from './includes/cache'
 import Config from './includes/config'
 import { fetchList, fetchPosts } from './includes/request'
-import { delay,getParameter } from './includes/utils'
+import { getParameter, promiseSeries, wait } from './includes/utils'
 
-async function main () {
+// @ts-ignore FUCK YOU VSCODE
+await new Promise(resolve => window.onload = resolve)
+
+if (window.top === window.self) {
   const gallery = getParameter('id')
-
+  
   // 설정 맞추기
   Config.sync()
-
+  
+  console.log(Config)
+  
   // 앱에서 사용할 요소와 스타일 시트 추가하기
   componentStyle.create()
   componentTooltip.create()
   componentContext.create()
   componentConfig.create()
-
+  
   if (document.querySelector('.gall_list')) {
     // 기존 게시글 목록 데이터 셋 초기화하기
     const fetching = []
-
+  
     for (let post of document.querySelectorAll('tr.ub-content') as NodeListOf<HTMLElement>) {
       // 게시글 번호
       if (!post.dataset.no) {
@@ -37,24 +42,21 @@ async function main () {
         fetching.push(post.dataset.no)
       }
     }
-
+  
     // 현재 페이지의 게시글 목록 초기화하기
+    // @ts-ignore
     await fetchPosts(gallery, fetching).catch(console.error)
-
-    // eslint-disable-next-line no-constant-condition
+  
     while (true) {
       const interval = Config.get<number>('live.interval') * 1000
-
+      const promises = [ wait(interval) ]
+  
       if (Config.get('live.enabled')) {
-        await fetchList(gallery).catch(console.error)
+        promises.push(fetchList(gallery).catch(console.error))
       }
-
-      await delay(interval)
+  
+      // @ts-ignore
+      await promiseSeries(promises)
     }
   }
-}
-
-// 최상단 페이지에서만 스크립트 실행하기
-if (window.top === window.self) {
-  window.onload = main
 }
